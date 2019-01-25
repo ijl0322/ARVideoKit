@@ -6,6 +6,7 @@
 //  Copyright © 2017 Ahmed Fathi Bekhit. All rights reserved.
 //
 
+import Foundation
 /// Allows specifying the final video orientation.
 @objc public enum ARFrameMode: Int {
     case auto    

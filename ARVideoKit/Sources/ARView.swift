@@ -65,21 +65,7 @@ import ARKit
         
         parentVC = vc
     }
-    
-    @objc init?(ARSpriteKit: ARSKView) {
-        super.init()
-        NotificationCenter.default.addObserver(self, selector: #selector(deviceDidRotate), name: NSNotification.Name.UIDeviceOrientationDidChange, object: nil)
         
-        let value = UIInterfaceOrientation.portrait.rawValue
-        UIDevice.current.setValue(value, forKey: "orientation")
-        
-        ViewAR.orientation = .portrait
-        guard let vc = ARSpriteKit.parent else {
-            return
-        }
-        parentVC = vc
-    }
-    
     @objc init?(SceneKit: SCNView) {
         super.init()
         NotificationCenter.default.addObserver(self, selector: #selector(deviceDidRotate), name: NSNotification.Name.UIDeviceOrientationDidChange, object: nil)

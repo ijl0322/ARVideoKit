@@ -126,27 +126,7 @@ private var renderer: RenderAR!
         view = ARSceneKit
         setup()
     }
-    
-    /**
-     Initialize 🌞🍳 `RecordAR` with an `ARSKView` 👾.
-     */
-    @objc override public init?(ARSpriteKit: ARSKView) {
-        super.init(ARSpriteKit: ARSpriteKit)
-        view = ARSpriteKit
-        scnView = SCNView(frame: UIScreen.main.bounds)
         
-        let bundle = Bundle(for: RecordAR.self)
-        let url = bundle.url(forResource: "video.scnassets/vid", withExtension: "scn")
-        
-        do {
-            let scene = try SCNScene(url: url!, options: nil)
-            scnView.scene = scene
-            setup()
-        }catch let error {
-            logAR.message("Error occurred while loading SK Video Assets : \(error). Please download \"video.scnassets\" from\nwww.ahmedbekhit.com/ARVideoKitAssets")
-        }
-    }
-    
     /**
      Initialize 🌞🍳 `RecordAR` with an `SCNView` 🚀.
      */
@@ -226,42 +206,6 @@ private var renderer: RenderAR!
             gpuLoop.add(to: .main, forMode: .commonModes)
             
             status = .readyToRecord
-        } else if let view = view as? ARSKView {
-            guard let mtlDevice = MTLCreateSystemDefaultDevice() else {
-                logAR.message("ERROR:- This device does not support Metal")
-                return
-            }
-            let material = SCNMaterial()
-            material.diffuse.contents = view.scene
-            
-            let plane = SCNPlane(width: view.bounds.width, height: view.bounds.height)
-            let node = SCNNode(geometry: plane)
-            node.geometry?.firstMaterial = material
-            node.position = SCNVector3Make(0, 0, 0)
-            
-            scnView.scene?.rootNode.addChildNode(node)
-            
-            renderEngine = SCNRenderer(device: mtlDevice, options: nil)
-            renderEngine.scene = scnView.scene
-            
-            gpuLoop = CADisplayLink(target: self, selector: #selector(renderFrame))
-            gpuLoop.preferredFramesPerSecond = fps.rawValue
-            gpuLoop.add(to: .main, forMode: .commonModes)
-            
-            status = .readyToRecord
-        } else if let view = view as? SCNView {
-            guard let mtlDevice = MTLCreateSystemDefaultDevice() else {
-                logAR.message("ERROR:- This device does not support Metal")
-                return
-            }
-            renderEngine = SCNRenderer(device: mtlDevice, options: nil)
-            renderEngine.scene = view.scene
-            
-            gpuLoop = CADisplayLink(target: self, selector: #selector(renderFrame))
-            gpuLoop.preferredFramesPerSecond = fps.rawValue
-            gpuLoop.add(to: .main, forMode: .commonModes)
-            
-            status = .readyToRecord
         }
         
         onlyRenderWhileRec = onlyRenderWhileRecording
@@ -270,104 +214,8 @@ private var renderer: RenderAR!
 
         NotificationCenter.default.addObserver(self, selector: #selector(appWillEnterBackground), name: Notification.Name.UIApplicationWillResignActive, object: nil)
     }
-    
-    
+  
 
-
-    //MARK: - Public methods for capturing videos, photos, Live Photos, and GIFs
-
-    /// A method that renders a photo 🌄 and returns it as `UIImage`.
-    @objc public func photo() -> UIImage {
-        if let buffer = renderer.buffer {
-            return imageFromBuffer(buffer: buffer)
-        }
-        return UIImage()
-    }
-    /**
-     A method that renders a `PHLivePhoto` 🎇 and returns `PHLivePhotoPlus` in the completion handler.
-     
-     In order to manually export the `PHLivePhotoPlus`, use `export(live photo: PHLivePhotoPlus)` method.
-     - parameter export: A boolean that enables or disables automatically exporting the `PHLivePhotoPlus` when ready.
-     - parameter finished: A block that will be called when Live Photo rendering is complete.
-     
-        The block returns the following parameters:
-     
-        `status`
-        A boolean that returns `true` when a `PHLivePhotoPlus` is successfully rendered. Otherwise, it returns `false`.
-     
-        `livePhoto`
-        A `PHLivePhotoPlus` object that contains a `PHLivePhoto` and other objects to allow manual exporting of a live photo.
-     
-        `permissionStatus`
-        A `PHAuthorizationStatus` object that returns the current application's status for exporting media to the Photo Library. It returns `nil` if the `export` parameter is `false`.
-     
-        `exported`
-        A boolean that returns `true` when a `PHLivePhotoPlus` is successfully exported to the Photo Library. Otherwise, it returns `false`.
-     */
-    @objc public func livePhoto(export: Bool, _ finished: ((_ status: Bool, _ livePhoto: PHLivePhotoPlus, _ permissionStatus: PHAuthorizationStatus, _ exported: Bool) -> Swift.Void)? = nil) {
-        self.record(forDuration: 3.0) { path in
-            let generator: LivePhotoGenerator? = LivePhotoGenerator()
-            generator?.generate(livePhoto: path) { success, photo, frames, keyFrame in
-                if success && export {
-                    if self.fileCount == 0 {
-                        self.fileCount += 1
-                        self.export(live: photo!) { done, status in
-                            finished?(true, photo!, status, done)
-                        }
-                    }
-                } else {
-                    finished?(success, photo!, PHAuthorizationStatus.notDetermined, false)
-                }
-            }
-        }
-    }
-    /**
-     A method that generates a GIF 🎆 image and returns its local path (`URL`) in the completion handler.
-     
-     In order to manually export the GIF image `URL`, use `func export(image path: URL)` method.
-     - parameter duration: A `TimeInterval` object that can be set to the duration specified in seconds.
-     - parameter export: A boolean that enables or disables automatically exporting the GIF image `URL` when ready.
-     - parameter finished: A block that will be called when GIF image rendering is complete.
-
-        The block returns the following parameters:
-     
-        `status`
-        A boolean that returns `true` when a GIF image `URL` is successfully rendered. Otherwise, it returns `false`.
-     
-        `gifPath`
-        A `URL` object that contains the local file path of the GIF image to allow manual exporting of a GIF.
-     
-        `permissionStatus`
-        A `PHAuthorizationStatus` object that returns the current application's status for exporting media to the Photo Library. It returns `nil` if the `export` parameter is `false`.
-     
-        `exported`
-        A boolean that returns `true` when a GIF image `URL` is successfully exported to the Photo Library. Otherwise, it returns `false`.
-     */
-    @objc public func gif(forDuration duration: TimeInterval, export: Bool, _ finished: ((_ status: Bool, _ gifPath: URL, _ permissionStatus: PHAuthorizationStatus, _ exported: Bool) -> Swift.Void)? = nil) {
-        writerQueue.sync {
-            self.isRecordingGIF = true
-            DispatchQueue.main.asyncAfter(deadline: .now() + duration) {
-                self.isRecordingGIF = false
-                let generator: GIFGenerator? = GIFGenerator()
-                generator?.generate(gif: self.gifImages, with: 0.1, loop: 0, adjust: self.adjustGIFForSharing) { ready, path in
-                    // FIXME: `path` may be nil
-                    if ready {
-                        self.gifImages.removeAll()
-                        if export {
-                            self.export(image: path!) { done, status in
-                                finished?(ready, path!, status, done)
-                            }
-                        } else {
-                            finished?(ready, path!, .notDetermined, false)
-                        }
-                    } else {
-                        self.gifImages.removeAll()
-                        finished?(ready, path!, .notDetermined, false)
-                    }
-                }
-            }
-        }
-    }
     ///A method that starts or resumes ⏯ recording a video 📹.
     @objc public func record() {
         writerQueue.sync {
@@ -382,46 +230,7 @@ private var renderer: RenderAR!
             }
         }
     }
-    /**
-     A method that starts recording a video 📹 with a specified duration ⏳ in seconds.
-     
-     In order to stop the recording before the specified duration, simply call `stop()` or `stopAndExport()` methods.
-     
-     - WARNING: You CAN NOT `pause()` video recording when a duration is specified.
-     - parameter duration: A `TimeInterval` object that can be set to the duration specified in seconds.
-     - parameter finished: A block that will be called when the specified `duration` has ended.
-     
-        The block returns the following parameter:
-     
-        `videoPath`
-        A `URL` object that contains the local file path of the video to allow manual exporting or preview of the video.
-     */
-    @objc public func record(forDuration duration: TimeInterval, _ finished: ((_ videoPath: URL) -> Swift.Void)? = nil) {
-        writerQueue.sync {
-            if self.enableAudio && micStatus == .unknown {
-                self.requestMicrophonePermission { _ in
-                    self.recordingWithLimit = true
-                    self.isRecording = true
-                    self.status = .recording
-                    DispatchQueue.main.asyncAfter(deadline: .now() + duration) {
-                        self.stop { path in
-                            finished?(path)
-                        }
-                    }
-                }
-            } else {
-                self.recordingWithLimit = true
-                self.isRecording = true
-                self.status = .recording
-                DispatchQueue.main.asyncAfter(deadline: .now() + duration) {
-                    self.stop { path in
-                        finished?(path)
-                    }
-                }
-            }
 
-        }
-    }
     /**
      A method that pauses recording a video ⏸📹.
      
@@ -591,59 +400,7 @@ private var renderer: RenderAR!
             finished?(false, status)
         }
     }
-    /**
-     A method that exports a `PHLivePhotoPlus` 🎇 object to the Photo Library 📲💾.
-     
-     - parameter photo: A `PHLivePhotoPlus` object that can be set to the returned `PHLivePhotoPlus` object in the `livePhoto(export: Bool, _ finished:{})` method.
-     
-     - parameter finished: A block that will be called when the export process is complete.
-     
-     The block returns the following parameters:
-     
-     `exported`
-     A boolean that returns `true` when the Live Photo is successfully exported to the Photo Library. Otherwise, it returns `false`.
-     
-     `permissionStatus`
-     A `PHAuthorizationStatus` object that returns the current application's status for exporting media to the Photo Library.
-     */
-    @objc public func export(live photo: PHLivePhotoPlus, _ finished: ((_ exported: Bool, _ permissionStatus: PHAuthorizationStatus) -> Void)? = nil) {
-        guard let keyPhotoPath = photo.keyPhotoPath else {
-            logAR.message("An error occurred while exporting a live photo")
-            return
-        }
-        guard let videoPath = photo.pairedVideoPath else {
-            logAR.message("An error occurred while exporting a live photo")
-            return
-        }
-        
-        let status = PHPhotoLibrary.authorizationStatus()
-        if status == .notDetermined {
-            PHPhotoLibrary.requestAuthorization() { status in
-                // Recursive call after authorization request
-                self.export(live: photo, finished)
-            }
-        } else if status == .authorized {
-            PHPhotoLibrary.shared().performChanges({
-                let request = PHAssetCreationRequest.forAsset()
-                let options = PHAssetResourceCreationOptions()
-                request.addResource(with: .photo, fileURL: keyPhotoPath, options: options)
-                request.addResource(with: .pairedVideo, fileURL: videoPath, options: options)
-            }) { saved, error  in
-                if saved {
-                    if self.deleteCacheWhenExported {
-                        logAR.remove(from: keyPhotoPath)
-                        logAR.remove(from: videoPath)
-                    }
-                    self.fileCount = 0
-                } else {
-                    logAR.message("An error occurred while exporting a live photo: \(error!)")
-                }
-                finished?(saved, status)
-            }
-        } else if status == .denied || status == .restricted {
-            finished?(false, status)
-        }
-    }
+
     
     /**
      A method that requsts microphone 🎙 permission manually, if micPermission is set to `manual`.

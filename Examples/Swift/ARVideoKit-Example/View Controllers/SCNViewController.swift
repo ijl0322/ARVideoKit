@@ -146,55 +146,6 @@ extension SCNViewController {
         self.dismiss(animated: true, completion: nil)
     }
     
-    @IBAction func capture(_ sender: UIButton) {
-        if sender.tag == 0 {
-            //Photo
-            if recorder?.status == .readyToRecord {
-                let image = self.recorder?.photo()
-                self.recorder?.export(UIImage: image) { saved, status in
-                    if saved {
-                        // Inform user photo has exported successfully
-                        self.exportMessage(success: saved, status: status)
-                    }
-                }
-            }
-        }else if sender.tag == 1 {
-            //Live Photo
-            if recorder?.status == .readyToRecord {
-                caprturingQueue.async {
-                    self.recorder?.livePhoto(export: true) { ready, photo, status, saved in
-                        /*
-                         if ready {
-                         // Do something with the `photo` (PHLivePhotoPlus)
-                         }
-                         */
-                        
-                        if saved {
-                            // Inform user Live Photo has exported successfully
-                            self.exportMessage(success: saved, status: status)
-                        }
-                    }
-                }
-            }
-        }else if sender.tag == 2 {
-            //GIF
-            if recorder?.status == .readyToRecord {
-                recorder?.gif(forDuration: 3.0, export: true) { ready, gifPath, status, saved in
-                    /*
-                    if ready {
-                        // Do something with the `gifPath`
-                    }
-                     */
-                    
-                    if saved {
-                        // Inform user GIF image has exported successfully
-                        self.exportMessage(success: saved, status: status)
-                    }
-                }
-            }
-        }
-    }
-    
     @IBAction func record(_ sender: UIButton) {
         if sender.tag == 0 {
             //Record
@@ -209,39 +160,6 @@ extension SCNViewController {
                 sender.setTitle("Record", for: .normal)
                 pauseBtn.setTitle("Pause", for: .normal)
                 pauseBtn.isEnabled = false
-                recorder?.stop() { path in
-                    self.recorder?.export(video: path) { saved, status in
-                        DispatchQueue.main.sync {
-                            self.exportMessage(success: saved, status: status)
-                        }
-                    }
-                }
-            }
-        }else if sender.tag == 1 {
-            //Record with duration
-            if recorder?.status == .readyToRecord {
-                sender.setTitle("Stop", for: .normal)
-                pauseBtn.setTitle("Pause", for: .normal)
-                pauseBtn.isEnabled = false
-                recordBtn.isEnabled = false
-                recordingQueue.async {
-                    self.recorder?.record(forDuration: 10) { path in
-                        self.recorder?.export(video: path) { saved, status in
-                            DispatchQueue.main.sync {
-                                sender.setTitle("w/Duration", for: .normal)
-                                self.pauseBtn.setTitle("Pause", for: .normal)
-                                self.pauseBtn.isEnabled = false
-                                self.recordBtn.isEnabled = true
-                                self.exportMessage(success: saved, status: status)
-                            }
-                        }
-                    }
-                }
-            }else if recorder?.status == .recording {
-                sender.setTitle("w/Duration", for: .normal)
-                pauseBtn.setTitle("Pause", for: .normal)
-                pauseBtn.isEnabled = false
-                recordBtn.isEnabled = true
                 recorder?.stop() { path in
                     self.recorder?.export(video: path) { saved, status in
                         DispatchQueue.main.sync {
