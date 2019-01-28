@@ -26,9 +26,8 @@ class WritAR: NSObject, AVCaptureAudioDataOutputSampleBufferDelegate {
     private var isRecording: Bool = false
     
     var delegate: RecordARDelegate?
-    var videoInputOrientation: ARVideoOrientation = .auto
 
-    init(output: URL, width: Int, height: Int, adjustForSharing: Bool, audioEnabled: Bool, orientaions:[ARInputViewOrientation], queue: DispatchQueue, allowMix: Bool) {
+    init(output: URL, width: Int, height: Int, adjustForSharing: Bool, audioEnabled: Bool, queue: DispatchQueue, allowMix: Bool) {
         super.init()
         do {
             assetWriter = try AVAssetWriter(outputURL: output, fileType: AVFileType.mp4)
@@ -66,14 +65,7 @@ class WritAR: NSObject, AVCaptureAudioDataOutputSampleBufferDelegate {
         videoInput.expectsMediaDataInRealTime = true
         pixelBufferInput = AVAssetWriterInputPixelBufferAdaptor(assetWriterInput: videoInput, sourcePixelBufferAttributes: nil)
 
-        var angleEnabled: Bool {
-            for v in orientaions {
-                if UIDevice.current.orientation.rawValue == v.rawValue {
-                    return true
-                }
-            }
-            return false
-        }
+        var angleEnabled = false
         
         var recentAngle: CGFloat = 0
         var rotationAngle: CGFloat = 0
@@ -95,21 +87,7 @@ class WritAR: NSObject, AVCaptureAudioDataOutputSampleBufferDelegate {
             rotationAngle = 0
         }
         
-        var t = CGAffineTransform.identity
-
-        switch videoInputOrientation {
-        case .auto:
-            t = t.rotated(by: ((rotationAngle*CGFloat.pi) / 180))
-        case .alwaysPortrait:
-            t = t.rotated(by: 0)
-        case .alwaysLandscape:
-            if rotationAngle == 90 || rotationAngle == -90 {
-                t = t.rotated(by: ((rotationAngle * CGFloat.pi) / 180))
-            } else {
-                t = t.rotated(by: ((-90 * CGFloat.pi) / 180))
-            }
-        }
-        
+        let t = CGAffineTransform.identity
         videoInput.transform = t
         
         if assetWriter.canAdd(videoInput) {

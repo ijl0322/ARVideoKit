@@ -21,14 +21,7 @@ extension RecordAR {
         let context = CIContext()
         let cgImg = context.createCGImage(coreImg, from: coreImg.extent)
         
-        var angleEnabled: Bool {
-            for v in inputViewOrientations {
-                if UIDevice.current.orientation.rawValue == v.rawValue {
-                    return true
-                }
-            }
-            return false
-        }
+        var angleEnabled = false
         
         var recentAngle: CGFloat = 0
         var rotationAngle: CGFloat = 0

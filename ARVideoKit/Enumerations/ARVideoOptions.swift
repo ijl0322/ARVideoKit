@@ -15,16 +15,6 @@ import Foundation
     case aspectFill
 }
 
-/// Allows specifying the video rendering frame per second `FPS` rate.
-@objc public enum ARVideoFrameRate: Int {
-    /// The framework automatically sets the most appropriate `FPS` based on the device support.
-    case auto = 0
-    /// Sets the `FPS` to 30 frames per second.
-    case fps30 = 30
-    /// Sets the `FPS` to 60 frames per second.
-    case fps60 = 60
-}
-
 /// Allows specifying the final video orientation.
 @objc public enum ARVideoOrientation: Int {
     /// The framework automatically sets the video orientation based on the active `ARInputViewOrientation` orientations.

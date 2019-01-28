@@ -63,10 +63,6 @@ private var renderer: RenderAR!
         }
     }
     /**
-     An object that allow customizing the video frame per second rate. Default is `.auto`.
-     */
-    @objc public var fps: ARVideoFrameRate = .auto
-    /**
      An object that allow customizing the video orientation. Default is `.auto`.
      */
     @objc public var videoOrientation: ARVideoOrientation = .auto
@@ -124,15 +120,6 @@ private var renderer: RenderAR!
     @objc override public init?(ARSceneKit: ARSCNView) {
         super.init(ARSceneKit: ARSceneKit)
         view = ARSceneKit
-        setup()
-    }
-        
-    /**
-     Initialize 🌞🍳 `RecordAR` with an `SCNView` 🚀.
-     */
-    @objc override public init?(SceneKit: SCNView) {
-        super.init(SceneKit: SceneKit)
-        view = SceneKit
         setup()
     }
     
@@ -202,7 +189,7 @@ private var renderer: RenderAR!
             renderEngine.scene = view.scene
             
             gpuLoop = CADisplayLink(target: self, selector: #selector(renderFrame))
-            gpuLoop.preferredFramesPerSecond = fps.rawValue
+            gpuLoop.preferredFramesPerSecond = 0 // Let GPU decide what framerate to use
             gpuLoop.add(to: .main, forMode: .commonModes)
             
             status = .readyToRecord
@@ -521,8 +508,7 @@ extension RecordAR {
                 } else {
                     self.currentVideoPath = self.newVideoPath
                     
-                    self.writer = WritAR(output: self.currentVideoPath!, width: Int(size.width), height: Int(size.height), adjustForSharing: self.adjustVideoForSharing, audioEnabled: self.enableAudio, orientaions: self.inputViewOrientations, queue: self.writerQueue, allowMix: self.enableMixWithOthers)
-                    self.writer?.videoInputOrientation = self.videoOrientation
+                    self.writer = WritAR(output: self.currentVideoPath!, width: Int(size.width), height: Int(size.height), adjustForSharing: self.adjustVideoForSharing, audioEnabled: self.enableAudio, queue: self.writerQueue, allowMix: self.enableMixWithOthers)
                     self.writer?.delegate = self.delegate
                 }
             } else if !self.isRecording && self.adjustPausedTime {

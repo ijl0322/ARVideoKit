@@ -8,15 +8,6 @@
 
 import UIKit
 
-/// Allows specifying the accepted orientaions in a `UIViewController` with AR scenes.
-@objc public enum ARInputViewOrientation: Int {
-    /// Enables the portrait input views orientation.
-    case portrait = 1
-    /// Enables the landscape left input views orientation.
-    case landscapeLeft = 3
-    /// Enables the landscape right input views orientation.
-    case landscapeRight = 4
-}
 
 /// Allows specifying which subviews will rotate in a `UIViewController` with AR scenes.
 public enum ARInputViewOrientationMode {

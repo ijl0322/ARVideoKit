@@ -62,8 +62,6 @@ class SCNViewController: UIViewController, ARSCNViewDelegate, RenderARDelegate, 
         //record or photo add environment light rendering, Default is false
         recorder?.enableAdjustEnvironmentLighting = true
         
-        // Set the UIViewController orientations
-        recorder?.inputViewOrientations = [.landscapeLeft, .landscapeRight, .portrait]
         // Configure RecordAR to store media files in local app directory
         recorder?.deleteCacheWhenExported = false
     }
