@@ -20,40 +20,7 @@ extension RecordAR {
         let coreImg = CIImage(cvPixelBuffer: buffer)
         let context = CIContext()
         let cgImg = context.createCGImage(coreImg, from: coreImg.extent)
-        
-        var angleEnabled = false
-        
-        var recentAngle: CGFloat = 0
-        var rotationAngle: CGFloat = 0
-        switch UIDevice.current.orientation {
-        case .landscapeLeft:
-            rotationAngle = -90
-            recentAngle = -90
-        case .landscapeRight:
-            rotationAngle = 90
-            recentAngle = 90
-        case .faceUp, .faceDown, .portraitUpsideDown:
-            rotationAngle = recentAngle
-        default:
-            rotationAngle = 0
-            recentAngle = 0
-        }
-        
-        if !angleEnabled {
-            rotationAngle = 0
-        }
-        
-        switch videoOrientation {
-        case .alwaysPortrait:
-            rotationAngle = 0
-        case .alwaysLandscape:
-            if rotationAngle != 90 || rotationAngle != -90 {
-                rotationAngle = -90
-            }
-        default:
-            break
-        }
-        
+        let rotationAngle: CGFloat = 0
         return UIImage(cgImage: cgImg!).rotate(by: rotationAngle, flip: false)
     }
     

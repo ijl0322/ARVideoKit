@@ -88,9 +88,6 @@ class SCNViewController: UIViewController, ARSCNViewDelegate, RenderARDelegate, 
         }
         recorder?.onlyRenderWhileRecording = true
         recorder?.prepare(ARWorldTrackingConfiguration())
-        
-        // Switch off the orientation lock for UIViewControllers with AR Scenes
-        recorder?.rest()
     }
     
     override func didReceiveMemoryWarning() {

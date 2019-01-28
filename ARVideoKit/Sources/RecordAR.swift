@@ -50,18 +50,7 @@ private var renderer: RenderAR!
     /**
      An object that allow customizing when to ask for Microphone permission, if needed. Default is `.manual`.
      */
-    @objc public var requestMicPermission: RecordARMicrophonePermission = .manual {
-        didSet {
-            switch self.requestMicPermission {
-            case .auto:
-                if self.enableAudio {
-                    self.requestMicrophonePermission()
-                }
-            case .manual:
-                break
-            }
-        }
-    }
+
     /**
      An object that allow customizing the video orientation. Default is `.auto`.
      */
@@ -78,14 +67,7 @@ private var renderer: RenderAR!
             self.onlyRenderWhileRec = self.onlyRenderWhileRecording
         }
     }
-    /**
-     A boolean that enables or disables audio recording. Default is `true`.
-     */
-    @objc public var enableAudio: Bool = true {
-        didSet {
-            self.requestMicPermission = (self.requestMicPermission == .manual) ? .manual: .auto
-        }
-    }
+
     /**
      A boolean that enables or disables audio `mixWithOthers` if audio recording is enabled. This allows playing music and recording audio at the same time. Default is `true`.
      */
@@ -125,7 +107,6 @@ private var renderer: RenderAR!
     
     //MARK: - threads
     let writerQueue = DispatchQueue(label:"com.ahmedbekhit.WriterQueue")
-    let gifWriterQueue = DispatchQueue(label: "com.ahmedbekhit.GIFWriterQueue", attributes: .concurrent)
     let audioSessionQueue = DispatchQueue(label: "com.ahmedbekhit.AudioSessionQueue", attributes: .concurrent)
     
     //MARK: - Objects
@@ -206,7 +187,7 @@ private var renderer: RenderAR!
     ///A method that starts or resumes ⏯ recording a video 📹.
     @objc public func record() {
         writerQueue.sync {
-            if self.enableAudio && micStatus == .unknown {
+            if micStatus == .unknown {
                 self.requestMicrophonePermission { _ in
                     self.isRecording = true
                     self.status = .recording
@@ -423,29 +404,11 @@ private var renderer: RenderAR!
         ARcontentMode = contentMode
         onlyRenderWhileRec = onlyRenderWhileRecording
         if let view = view as? ARSCNView {
-            UIDevice.current.setValue(UIInterfaceOrientation.portrait.rawValue, forKey: "orientation")
-            ViewAR.orientation = .portrait
             
             //try resetting anchors for the initial landscape orientation issue.
             guard let config = configuration else { return }
             view.session.run(config)
-        } else if let view = view as? ARSKView {
-            UIDevice.current.setValue(UIInterfaceOrientation.portrait.rawValue, forKey: "orientation")
-            ViewAR.orientation = .portrait
-            guard let config = configuration else { return }
-            view.session.run(config)
-        } else if let _ = view as? SCNView {
-            UIDevice.current.setValue(UIInterfaceOrientation.portrait.rawValue, forKey: "orientation")
-            ViewAR.orientation = .portrait
         }
-    }
-    /**
-     A method that switches off the orientation lock used in a `UIViewController` with AR scenes 📐😴.
-     
-     Recommended to use in the `UIViewController`'s method `func viewWillDisappear(_ animated: Bool)`.
-    */
-    @objc public func rest() {
-        ViewAR.orientation = UIInterfaceOrientationMask(ViewAR.orientations)
     }
 }
 
@@ -471,13 +434,6 @@ extension RecordAR {
             var time: CMTime { return CMTimeMakeWithSeconds(renderer.time, 1000000) }
             
             self.renderAR?.frame(didRender: buffer, with: time, using: rawBuffer)
-
-            //gif images writing
-            if self.isRecordingGIF {
-                self.gifWriterQueue.sync {
-                    self.gifImages.append(self.imageFromBuffer(buffer: buffer))
-                }
-            }
             
             //frame writing
             if self.isRecording {
@@ -508,7 +464,7 @@ extension RecordAR {
                 } else {
                     self.currentVideoPath = self.newVideoPath
                     
-                    self.writer = WritAR(output: self.currentVideoPath!, width: Int(size.width), height: Int(size.height), adjustForSharing: self.adjustVideoForSharing, audioEnabled: self.enableAudio, queue: self.writerQueue, allowMix: self.enableMixWithOthers)
+                    self.writer = WritAR(output: self.currentVideoPath!, width: Int(size.width), height: Int(size.height), adjustForSharing: self.adjustVideoForSharing, queue: self.writerQueue, allowMix: self.enableMixWithOthers)
                     self.writer?.delegate = self.delegate
                 }
             } else if !self.isRecording && self.adjustPausedTime {

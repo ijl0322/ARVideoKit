@@ -37,12 +37,6 @@ import ARKit
     
     @objc init?(ARSceneKit: ARSCNView) {
         super.init()
-        
-        let value = UIInterfaceOrientation.portrait.rawValue
-        UIDevice.current.setValue(value, forKey: "orientation")
-        
-        ViewAR.orientation = .portrait
-        
         guard let vc = ARSceneKit.parent else {
             return
         }

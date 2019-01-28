@@ -27,7 +27,7 @@ class WritAR: NSObject, AVCaptureAudioDataOutputSampleBufferDelegate {
     
     var delegate: RecordARDelegate?
 
-    init(output: URL, width: Int, height: Int, adjustForSharing: Bool, audioEnabled: Bool, queue: DispatchQueue, allowMix: Bool) {
+    init(output: URL, width: Int, height: Int, adjustForSharing: Bool, queue: DispatchQueue, allowMix: Bool) {
         super.init()
         do {
             assetWriter = try AVAssetWriter(outputURL: output, fileType: AVFileType.mp4)
@@ -35,18 +35,16 @@ class WritAR: NSObject, AVCaptureAudioDataOutputSampleBufferDelegate {
             fatalError("An error occurred while intializing an AVAssetWriter")
         }
         
-        if audioEnabled {
-            if allowMix {
-                let audioOptions: AVAudioSessionCategoryOptions = [.mixWithOthers , .allowBluetooth, .defaultToSpeaker, .interruptSpokenAudioAndMixWithOthers]
-                try? AVAudioSession.sharedInstance().setCategory(AVAudioSessionCategoryPlayAndRecord, with: audioOptions)
-                try? AVAudioSession.sharedInstance().setActive(true)
-            }
-            AVAudioSession.sharedInstance().requestRecordPermission({ permitted in
-                if permitted {
-                    self.prepareAudioDevice(with: queue)
-                }
-            })
+        if allowMix {
+          let audioOptions: AVAudioSessionCategoryOptions = [.mixWithOthers , .allowBluetooth, .defaultToSpeaker, .interruptSpokenAudioAndMixWithOthers]
+          try? AVAudioSession.sharedInstance().setCategory(AVAudioSessionCategoryPlayAndRecord, with: audioOptions)
+          try? AVAudioSession.sharedInstance().setActive(true)
         }
+        AVAudioSession.sharedInstance().requestRecordPermission({ permitted in
+          if permitted {
+            self.prepareAudioDevice(with: queue)
+          }
+        })
         
         //HEVC file format only supports A10 Fusion Chip or higher.
         //to support HEVC, make sure to check if the device is iPhone 7 or higher
@@ -55,38 +53,12 @@ class WritAR: NSObject, AVCaptureAudioDataOutputSampleBufferDelegate {
             AVVideoWidthKey: width as AnyObject,
             AVVideoHeightKey: height as AnyObject
         ]
-        
-//        let attributes: [String: Bool] = [
-//            kCVPixelBufferCGImageCompatibilityKey as String: true,
-//            kCVPixelBufferCGBitmapContextCompatibilityKey as String: true
-//        ]
+      
         videoInput = AVAssetWriterInput(mediaType: .video, outputSettings: videoOutputSettings)
 
         videoInput.expectsMediaDataInRealTime = true
         pixelBufferInput = AVAssetWriterInputPixelBufferAdaptor(assetWriterInput: videoInput, sourcePixelBufferAttributes: nil)
-
-        var angleEnabled = false
-        
-        var recentAngle: CGFloat = 0
-        var rotationAngle: CGFloat = 0
-        switch UIDevice.current.orientation {
-        case .landscapeLeft:
-            rotationAngle = -90
-            recentAngle = -90
-        case .landscapeRight:
-            rotationAngle = 90
-            recentAngle = 90
-        case .faceUp, .faceDown, .portraitUpsideDown:
-            rotationAngle = recentAngle
-        default:
-            rotationAngle = 0
-            recentAngle = 0
-        }
-        
-        if !angleEnabled {
-            rotationAngle = 0
-        }
-        
+      
         let t = CGAffineTransform.identity
         videoInput.transform = t
         

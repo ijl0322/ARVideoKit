@@ -25,14 +25,6 @@ import Foundation
     case alwaysLandscape
 }
 
-/// Allows specifying when to request Microphone access.
-@objc public enum RecordARMicrophonePermission: Int {
-    /// The framework automatically requests Microphone access when needed.
-    case auto
-    /// Allows manual permission request.
-    case manual
-}
-
 /// An object that returns the AR recorder current status.
 @objc public enum RecordARStatus: Int {
     /// The current status of the recorder is unknown.
