@@ -17,7 +17,7 @@ private var renderEngine: SCNRenderer!
 private var gpuLoop: CADisplayLink!
 private var isResting = false
 @available(iOS 11.0, *)
-private var renderer: RenderAR!
+private var renderer: ARSCNBufferRenderer!
 /**
  This class renders the `ARSCNView` or `ARSKView` content with the device's camera stream to generate a video 📹, photo 🌄, live photo 🎇 or GIF 🎆.
 
@@ -58,37 +58,23 @@ private var renderer: RenderAR!
     }
     
     //MARK: - threads
-    let writerQueue = DispatchQueue(label:"com.ahmedbekhit.WriterQueue")
-    let audioSessionQueue = DispatchQueue(label: "com.ahmedbekhit.AudioSessionQueue", attributes: .concurrent)
+    let writerQueue = DispatchQueue(label:"com.littlstar.ARWriterQueue")
+    let audioSessionQueue = DispatchQueue(label: "com.littlstar.ARAudioSessionQueue", attributes: .concurrent)
     
     //MARK: - Objects
     private var scnView: SCNView!
     private var fileCount = 0
 
     var isRecording = false
-    //Used to locate the path of the video recording
     var currentVideoPath: URL?
-    //Used to locate the path of the audio recording
-    var currentAudioPath: URL?
-    //Used to initialize the video writer
     var writer: WritAR?
-    //Used to generate a new video path
+  
+    //Generate a video path in Temp directory
+    //Video may be delete by system after app termination.
     var newVideoPath: URL {
-        let paths = NSSearchPathForDirectoriesInDomains(.documentDirectory, .userDomainMask, true)
-        let documentsDirectory = paths[0]
-        
-        let formatter = DateFormatter()
-        formatter.dateStyle = .full
-        formatter.timeStyle = .full
-        formatter.dateFormat = "yyyy-MM-dd'@'HH-mm-ssZZZZ"
-
-        let date = Date(timeIntervalSince1970: Date().timeIntervalSince1970)
-        
-        let vidPath = "\(documentsDirectory)/\(formatter.string(from: date))ARVideo.mp4"
-        return URL(fileURLWithPath: vidPath, isDirectory: false)
+        return URL(fileURLWithPath: NSTemporaryDirectory(), isDirectory: true).appendingPathComponent(UUID().uuidString).appendingPathExtension("mp4")
     }
-    
-    //MARK: - Video Setup
+  
     func setup() {
         if let view = view as? ARSCNView {
             guard let mtlDevice = MTLCreateSystemDefaultDevice() else {
@@ -107,9 +93,7 @@ private var renderer: RenderAR!
         }
       
         
-        renderer = RenderAR(view, renderer: renderEngine)
-
-        NotificationCenter.default.addObserver(self, selector: #selector(appWillEnterBackground), name: Notification.Name.UIApplicationWillResignActive, object: nil)
+        renderer = ARSCNBufferRenderer(view, renderer: renderEngine)
     }
   
 
@@ -321,23 +305,13 @@ private var renderer: RenderAR!
 @available(iOS 11.0, *)
 extension RecordAR {
     @objc func renderFrame() {
-        //frame rendering
-
         guard let buffer = renderer.buffer else { return }
-        guard let rawBuffer = renderer.rawBuffer else {
-            logAR.message("ERROR:- An error occurred while rendering the camera's main buffers.")
-            return
-        }
-        guard let size = renderer.bufferSize else {
-            logAR.message("ERROR:- An error occurred while rendering the camera buffer.")
-            return
-        }
+        guard let size = renderer.bufferSize else { return }
 
         self.writerQueue.sync {
             var time: CMTime { return CMTimeMakeWithSeconds(renderer.time, 1000000) }
-                        
-            //frame writing
             if self.isRecording {
+                // Have a writer already, continue writing to previous writer
                 if let frameWriter = self.writer {
                     let finalFrameTime = time
                     frameWriter.insert(pixel: buffer, with: finalFrameTime)
@@ -345,14 +319,13 @@ extension RecordAR {
                     guard let isWriting = frameWriter.isWritingWithoutError else { return }
                     if !isWriting {
                         self.isRecording = false
-                        
                         self.status = .readyToRecord
                         self.delegate?.recorder(didFailRecording: errSecDecode as? Error)
+                        // failed to write video buffer, pass video path to delegate to handle removing video
                         self.delegate?.recorder(didEndRecording: self.currentVideoPath!, with: false)
                     }
                 } else {
                     self.currentVideoPath = self.newVideoPath
-                    
                     self.writer = WritAR(output: self.currentVideoPath!, width: Int(size.width), height: Int(size.height), queue: self.writerQueue)
                     self.writer?.delegate = self.delegate
                 }

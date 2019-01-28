@@ -13,14 +13,14 @@ private var view: Any?
 private var renderEngine: SCNRenderer!
 
 @available(iOS 11.0, *)
-struct RenderAR {
+struct ARSCNBufferRenderer {
   
     init(_ ARview: Any?, renderer: SCNRenderer) {
         view = ARview
         renderEngine = renderer
     }
     
-    let pixelsQueue = DispatchQueue(label: "com.ahmedbekhit.PixelsQueue", attributes: .concurrent)
+    let pixelsQueue = DispatchQueue(label: "com.littlstar.ARPixelsQueue", attributes: .concurrent)
     var time: CFTimeInterval { return CACurrentMediaTime()}
     var rawBuffer: CVPixelBuffer? {
         if let view = view as? ARSCNView {

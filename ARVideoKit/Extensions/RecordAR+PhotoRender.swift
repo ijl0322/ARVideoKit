@@ -19,8 +19,4 @@ extension RecordAR {
         let cgImg = context.createCGImage(coreImg, from: coreImg.extent)
         return UIImage(cgImage: cgImg!)
     }
-    
-    @objc func appWillEnterBackground() {
-        delegate?.recorder(willEnterBackground: status)
-    }
 }

@@ -21,7 +21,7 @@ class WritAR: NSObject, AVCaptureAudioDataOutputSampleBufferDelegate {
     private var videoOutputSettings: Dictionary<String, AnyObject>!
     private var audioSettings: [String: Any]?
 
-    let audioBufferQueue = DispatchQueue(label: "com.ahmedbekhit.AudioBufferQueue")
+    let audioBufferQueue = DispatchQueue(label: "com.littlstar.ARAudioBufferQueue")
 
     private var isRecording: Bool = false
     
@@ -32,7 +32,8 @@ class WritAR: NSObject, AVCaptureAudioDataOutputSampleBufferDelegate {
         do {
             assetWriter = try AVAssetWriter(outputURL: output, fileType: AVFileType.mp4)
         } catch {
-            fatalError("An error occurred while intializing an AVAssetWriter")
+          print("An error occurred while intializing an AVAssetWriter")
+          return
         }
       
         // Enable background audio recording
@@ -45,8 +46,6 @@ class WritAR: NSObject, AVCaptureAudioDataOutputSampleBufferDelegate {
           }
         })
         
-        //HEVC file format only supports A10 Fusion Chip or higher.
-        //to support HEVC, make sure to check if the device is iPhone 7 or higher
         videoOutputSettings = [
             AVVideoCodecKey: AVVideoCodecType.h264 as AnyObject,
             AVVideoWidthKey: width as AnyObject,
@@ -93,8 +92,7 @@ class WritAR: NSObject, AVCaptureAudioDataOutputSampleBufferDelegate {
         if session.canAddOutput(audioDataOutput) {
             session.addOutput(audioDataOutput)
         }
-        
-
+      
         audioSettings = audioDataOutput.recommendedAudioSettingsForAssetWriter(writingTo: .m4v) as? [String: Any]
         
         audioInput = AVAssetWriterInput(mediaType: .audio, outputSettings: audioSettings)

@@ -34,13 +34,4 @@ import ARKit
      - parameter status: A string that returns the reason of the recorder failure in a string literal format.
      */
     func recorder(didFailRecording error: Error?)
-
-    /**
-     A protocol method that is triggered when the application will resign active.
-     - parameter status: A `RecordARStatus` object that returns the AR recorder current status.
-     
-     
-     - NOTE: Check [applicationWillResignActive(_:)](https://developer.apple.com/documentation/uikit/uiapplicationdelegate/1622950-applicationwillresignactive) for more information.
-     */
-    @objc func recorder(willEnterBackground status: RecordARStatus)
 }
