@@ -13,9 +13,7 @@
 		FBD604EF1FA96B2700EC9804 /* ARInputViewOptions.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBD604ED1FA96B2700EC9804 /* ARInputViewOptions.swift */; };
 		FBD604F51FA96B3300EC9804 /* UIImage+VideoBuffer.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBD604F01FA96B3300EC9804 /* UIImage+VideoBuffer.swift */; };
 		FBD604F71FA96B3300EC9804 /* RecordAR+PhotoRender.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBD604F21FA96B3300EC9804 /* RecordAR+PhotoRender.swift */; };
-		FBD604F81FA96B3300EC9804 /* UIView+isType.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBD604F31FA96B3300EC9804 /* UIView+isType.swift */; };
 		FBD604FC1FA96B3E00EC9804 /* RecordARDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBD604FA1FA96B3E00EC9804 /* RecordARDelegate.swift */; };
-		FBD604FD1FA96B3E00EC9804 /* RenderARDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBD604FB1FA96B3E00EC9804 /* RenderARDelegate.swift */; };
 		FBD605121FA96BA100EC9804 /* RecordAR.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBD6050E1FA96BA100EC9804 /* RecordAR.swift */; };
 		FBD605131FA96BA100EC9804 /* WritAR.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBD6050F1FA96BA100EC9804 /* WritAR.swift */; };
 		FBE5A5A62002BFCF0025C89F /* RenderAR.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBE5A5A52002BFCF0025C89F /* RenderAR.swift */; };
@@ -30,9 +28,7 @@
 		FBD604ED1FA96B2700EC9804 /* ARInputViewOptions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ARInputViewOptions.swift; sourceTree = "<group>"; };
 		FBD604F01FA96B3300EC9804 /* UIImage+VideoBuffer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "UIImage+VideoBuffer.swift"; sourceTree = "<group>"; };
 		FBD604F21FA96B3300EC9804 /* RecordAR+PhotoRender.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "RecordAR+PhotoRender.swift"; sourceTree = "<group>"; };
-		FBD604F31FA96B3300EC9804 /* UIView+isType.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "UIView+isType.swift"; sourceTree = "<group>"; };
 		FBD604FA1FA96B3E00EC9804 /* RecordARDelegate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RecordARDelegate.swift; sourceTree = "<group>"; };
-		FBD604FB1FA96B3E00EC9804 /* RenderARDelegate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RenderARDelegate.swift; sourceTree = "<group>"; };
 		FBD6050E1FA96BA100EC9804 /* RecordAR.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RecordAR.swift; sourceTree = "<group>"; };
 		FBD6050F1FA96BA100EC9804 /* WritAR.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = WritAR.swift; sourceTree = "<group>"; };
 		FBE5A5A52002BFCF0025C89F /* RenderAR.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RenderAR.swift; sourceTree = "<group>"; };
@@ -110,7 +106,6 @@
 			children = (
 				FBD604F21FA96B3300EC9804 /* RecordAR+PhotoRender.swift */,
 				FBD604F01FA96B3300EC9804 /* UIImage+VideoBuffer.swift */,
-				FBD604F31FA96B3300EC9804 /* UIView+isType.swift */,
 			);
 			path = Extensions;
 			sourceTree = "<group>";
@@ -119,7 +114,6 @@
 			isa = PBXGroup;
 			children = (
 				FBD604FA1FA96B3E00EC9804 /* RecordARDelegate.swift */,
-				FBD604FB1FA96B3E00EC9804 /* RenderARDelegate.swift */,
 			);
 			path = Protocols;
 			sourceTree = "<group>";
@@ -222,9 +216,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				FBD604F81FA96B3300EC9804 /* UIView+isType.swift in Sources */,
 				FBD604F71FA96B3300EC9804 /* RecordAR+PhotoRender.swift in Sources */,
-				FBD604FD1FA96B3E00EC9804 /* RenderARDelegate.swift in Sources */,
 				FBD605131FA96BA100EC9804 /* WritAR.swift in Sources */,
 				FBD604F51FA96B3300EC9804 /* UIImage+VideoBuffer.swift in Sources */,
 				FBD604EE1FA96B2700EC9804 /* ARVideoOptions.swift in Sources */,

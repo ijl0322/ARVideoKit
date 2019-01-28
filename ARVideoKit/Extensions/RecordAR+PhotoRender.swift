@@ -11,11 +11,8 @@ import Photos
 
 @available(iOS 11.0, *)
 extension RecordAR {
-    
-    func adjustTime(current: CMTime, resume: CMTime, pause: CMTime) -> CMTime {
-        return CMTimeSubtract(current, CMTimeSubtract(resume, pause))
-    }
-    
+
+    // Generate UIImage from CVPixelBuffer
     func imageFromBuffer(buffer: CVPixelBuffer) -> UIImage {
         let coreImg = CIImage(cvPixelBuffer: buffer)
         let context = CIContext()
@@ -26,8 +23,4 @@ extension RecordAR {
     @objc func appWillEnterBackground() {
         delegate?.recorder(willEnterBackground: status)
     }
-}
-
-extension FloatingPoint {
-    var degreesToRadians: Self { return self * .pi / 180 }
 }

@@ -35,10 +35,6 @@ private var renderer: RenderAR!
      */
     @objc public weak var delegate: RecordARDelegate?
     /**
-     An object that passes the AR rendered content in the protocol method.
-     */
-    @objc public weak var renderAR: RenderARDelegate?
-    /**
      An object that returns the AR recorder current status.
      */
     @objc public internal(set)var status: RecordARStatus = .unknown
@@ -167,7 +163,7 @@ private var renderer: RenderAR!
                 } else {
                     finished?(self.currentVideoPath!, .notDetermined, false)
                     self.status = .readyToRecord
-                    self.delegate?.recorder(didFailRecording: errSecDecode as? Error, and: "An error occured while stopping your video.")
+                    self.delegate?.recorder(didFailRecording: errSecDecode as? Error)
                 }
                 self.writer = nil
             }
@@ -194,7 +190,7 @@ private var renderer: RenderAR!
                         self.status = .readyToRecord
                     } else {
                         self.status = .readyToRecord
-                        self.delegate?.recorder(didFailRecording: errSecDecode as? Error, and: "An error occured while stopping your video.")
+                        self.delegate?.recorder(didFailRecording: errSecDecode as? Error)
                     }
                     self.writer = nil
                 }
@@ -339,9 +335,7 @@ extension RecordAR {
 
         self.writerQueue.sync {
             var time: CMTime { return CMTimeMakeWithSeconds(renderer.time, 1000000) }
-            
-            self.renderAR?.frame(didRender: buffer, with: time, using: rawBuffer)
-            
+                        
             //frame writing
             if self.isRecording {
                 if let frameWriter = self.writer {
@@ -353,7 +347,7 @@ extension RecordAR {
                         self.isRecording = false
                         
                         self.status = .readyToRecord
-                        self.delegate?.recorder(didFailRecording: errSecDecode as? Error, and: "An error occured while recording your video.")
+                        self.delegate?.recorder(didFailRecording: errSecDecode as? Error)
                         self.delegate?.recorder(didEndRecording: self.currentVideoPath!, with: false)
                     }
                 } else {

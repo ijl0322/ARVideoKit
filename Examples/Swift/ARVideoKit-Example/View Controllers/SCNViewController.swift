@@ -11,7 +11,7 @@ import ARKit
 import ARVideoKit
 import Photos
 
-class SCNViewController: UIViewController, ARSCNViewDelegate, RenderARDelegate, RecordARDelegate  {
+class SCNViewController: UIViewController, ARSCNViewDelegate, RecordARDelegate  {
     
     @IBOutlet var sceneView: ARSCNView!
     @IBOutlet var recordBtn: UIButton!
@@ -51,7 +51,6 @@ class SCNViewController: UIViewController, ARSCNViewDelegate, RenderARDelegate, 
         recorder?.delegate = self
 
         // Set the renderer's delegate
-        recorder?.renderAR = self
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -174,7 +173,7 @@ extension SCNViewController {
         }
     }
     
-    func recorder(didFailRecording error: Error?, and status: String) {
+    func recorder(didFailRecording error: Error?) {
         // Inform user an error occurred while recording.
     }
     
