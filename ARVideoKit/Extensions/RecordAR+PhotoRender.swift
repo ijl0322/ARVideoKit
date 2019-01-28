@@ -20,8 +20,7 @@ extension RecordAR {
         let coreImg = CIImage(cvPixelBuffer: buffer)
         let context = CIContext()
         let cgImg = context.createCGImage(coreImg, from: coreImg.extent)
-        let rotationAngle: CGFloat = 0
-        return UIImage(cgImage: cgImg!).rotate(by: rotationAngle, flip: false)
+        return UIImage(cgImage: cgImg!)
     }
     
     @objc func appWillEnterBackground() {

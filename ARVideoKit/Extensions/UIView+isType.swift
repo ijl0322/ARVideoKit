@@ -18,24 +18,3 @@ extension UIScreen {
         return self.nativeBounds.size == CGSize(width: 1125, height: 2436) || self.nativeBounds.size == CGSize(width: 2436, height: 1125)
     }
 }
-@available(iOS 11.0, *)
-extension UIView {
-    var parent: UIViewController? {
-        var responder: UIResponder? = self
-        while responder != nil {
-            responder = responder!.next
-            if let viewController = responder as? UIViewController {
-                return viewController
-            }
-        }
-        return nil
-    }
-    
-    var isButton: Bool {
-        return (self is UIButton)
-    }
-    
-    var isARView: Bool {
-        return (self is ARSCNView) || (self is ARSKView)
-    }
-}

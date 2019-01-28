@@ -14,12 +14,10 @@ private var renderEngine: SCNRenderer!
 
 @available(iOS 11.0, *)
 struct RenderAR {
-    var ARcontentMode: ARFrameMode!
-    
-    init(_ ARview: Any?, renderer: SCNRenderer, contentMode: ARFrameMode) {
+  
+    init(_ ARview: Any?, renderer: SCNRenderer) {
         view = ARview
         renderEngine = renderer
-        ARcontentMode = contentMode
     }
     
     let pixelsQueue = DispatchQueue(label: "com.ahmedbekhit.PixelsQueue", attributes: .concurrent)
@@ -33,42 +31,11 @@ struct RenderAR {
     }
     
     var bufferSize: CGSize? {
-        guard let raw = rawBuffer else { return nil }
-        var width = CVPixelBufferGetWidth(raw)
-        var height = CVPixelBufferGetHeight(raw)
-        
-        if let contentMode = ARcontentMode {
-            switch contentMode {
-            case .auto:
-                if UIScreen.main.isiPhone10 {
-                    width = Int(UIScreen.main.nativeBounds.width)
-                    height = Int(UIScreen.main.nativeBounds.height)
-                }
-            case .aspectFit:
-                width = CVPixelBufferGetWidth(raw)
-                height = CVPixelBufferGetHeight(raw)
-            case .aspectFill:
-                width = Int(UIScreen.main.nativeBounds.width)
-                height = Int(UIScreen.main.nativeBounds.height)
-            default:
-                if UIScreen.main.isiPhone10 {
-                    width = Int(UIScreen.main.nativeBounds.width)
-                    height = Int(UIScreen.main.nativeBounds.height)
-                }
-            }
-        }
-        
-        if width > height {
-            return CGSize(width: height, height: width)
-        } else {
-            return CGSize(width: width, height: height)
-        }
-    }
-    
-    var bufferSizeFill: CGSize? {
-        guard let raw = rawBuffer else { return nil }
-        let width = CVPixelBufferGetWidth(raw)
-        let height = CVPixelBufferGetHeight(raw)
+        guard rawBuffer != nil else { return nil }
+        // Aspect Fill Videos
+        let width = Int(UIScreen.main.nativeBounds.width)
+        let height = Int(UIScreen.main.nativeBounds.height)
+      
         if width > height {
             return CGSize(width: height, height: width)
         } else {

@@ -7,24 +7,6 @@
 //
 
 import Foundation
-/// Allows specifying the final video orientation.
-@objc public enum ARFrameMode: Int {
-    case auto    
-    case aspectFit
-    /// Recommended for iPhone X
-    case aspectFill
-}
-
-/// Allows specifying the final video orientation.
-@objc public enum ARVideoOrientation: Int {
-    /// The framework automatically sets the video orientation based on the active `ARInputViewOrientation` orientations.
-    case auto
-    /// Sets the video orientation to always portrait.
-    case alwaysPortrait
-    /// Sets the video orientation to always landscape.
-    case alwaysLandscape
-}
-
 /// An object that returns the AR recorder current status.
 @objc public enum RecordARStatus: Int {
     /// The current status of the recorder is unknown.

@@ -52,18 +52,6 @@ class SCNViewController: UIViewController, ARSCNViewDelegate, RenderARDelegate, 
 
         // Set the renderer's delegate
         recorder?.renderAR = self
-        
-        // Configure the renderer to perform additional image & video processing 👁
-        recorder?.onlyRenderWhileRecording = false
-        
-        // Configure ARKit content mode. Default is .auto
-        recorder?.contentMode = .aspectFill
-        
-        //record or photo add environment light rendering, Default is false
-        recorder?.enableAdjustEnvironmentLighting = true
-        
-        // Configure RecordAR to store media files in local app directory
-        recorder?.deleteCacheWhenExported = false
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -86,7 +74,6 @@ class SCNViewController: UIViewController, ARSCNViewDelegate, RenderARDelegate, 
         if recorder?.status == .recording {
             recorder?.stopAndExport()
         }
-        recorder?.onlyRenderWhileRecording = true
         recorder?.prepare(ARWorldTrackingConfiguration())
     }
     
@@ -170,7 +157,6 @@ extension SCNViewController {
                 recorder?.record()
             }else if recorder?.status == .recording {
                 sender.setTitle("Resume", for: .normal)
-                recorder?.pause()
             }
         }
     }

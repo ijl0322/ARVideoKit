@@ -27,19 +27,18 @@ class WritAR: NSObject, AVCaptureAudioDataOutputSampleBufferDelegate {
     
     var delegate: RecordARDelegate?
 
-    init(output: URL, width: Int, height: Int, adjustForSharing: Bool, queue: DispatchQueue, allowMix: Bool) {
+    init(output: URL, width: Int, height: Int, queue: DispatchQueue) {
         super.init()
         do {
             assetWriter = try AVAssetWriter(outputURL: output, fileType: AVFileType.mp4)
         } catch {
             fatalError("An error occurred while intializing an AVAssetWriter")
         }
-        
-        if allowMix {
-          let audioOptions: AVAudioSessionCategoryOptions = [.mixWithOthers , .allowBluetooth, .defaultToSpeaker, .interruptSpokenAudioAndMixWithOthers]
-          try? AVAudioSession.sharedInstance().setCategory(AVAudioSessionCategoryPlayAndRecord, with: audioOptions)
-          try? AVAudioSession.sharedInstance().setActive(true)
-        }
+      
+        // Enable background audio recording
+        let audioOptions: AVAudioSessionCategoryOptions = [.mixWithOthers , .allowBluetooth, .defaultToSpeaker, .interruptSpokenAudioAndMixWithOthers]
+        try? AVAudioSession.sharedInstance().setCategory(AVAudioSessionCategoryPlayAndRecord, with: audioOptions)
+        try? AVAudioSession.sharedInstance().setActive(true)
         AVAudioSession.sharedInstance().requestRecordPermission({ permitted in
           if permitted {
             self.prepareAudioDevice(with: queue)
@@ -68,7 +67,6 @@ class WritAR: NSObject, AVCaptureAudioDataOutputSampleBufferDelegate {
             delegate?.recorder(didFailRecording: assetWriter.error, and: "An error occurred while adding video input.")
             isWritingWithoutError = false
         }
-        assetWriter.shouldOptimizeForNetworkUse = adjustForSharing
     }
     
     func prepareAudioDevice(with queue: DispatchQueue) {
@@ -183,11 +181,7 @@ class WritAR: NSObject, AVCaptureAudioDataOutputSampleBufferDelegate {
             }
         }
     }
-    
-    func pause() {
-        isRecording = false
-    }
-    
+        
     func end(writing finished: @escaping () -> Void){
         if let session = session {
             if session.isRunning {

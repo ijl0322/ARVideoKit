@@ -16,7 +16,6 @@ private var view: Any?
 private var renderEngine: SCNRenderer!
 private var gpuLoop: CADisplayLink!
 private var isResting = false
-private var ARcontentMode: ARFrameMode!
 @available(iOS 11.0, *)
 private var renderer: RenderAR!
 /**
@@ -29,7 +28,7 @@ private var renderer: RenderAR!
  * [Email](mailto:me@ahmedbekhit.com)
  */
 @available(iOS 11.0, *)
-@objc public class RecordAR: ARView {
+@objc public class RecordAR: NSObject {
     //MARK: - Public objects to configure RecordAR
     /**
      An object that passes the AR recorder errors and status in the protocol methods.
@@ -47,60 +46,17 @@ private var renderer: RenderAR!
      An object that returns the current Microphone status.
      */
     @objc public internal(set)var micStatus: RecordARMicrophoneStatus = .unknown
-    /**
-     An object that allow customizing when to ask for Microphone permission, if needed. Default is `.manual`.
-     */
 
-    /**
-     An object that allow customizing the video orientation. Default is `.auto`.
-     */
-    @objc public var videoOrientation: ARVideoOrientation = .auto
-    /**
-     An object that allow customizing the AR content mode. Default is `.auto`.
-     */
-    @objc public var contentMode: ARFrameMode = .auto
-    /**
-     A boolean that enables or disables AR content rendering before recording for image & video processing. Default is `true`.
-     */
-    @objc public var onlyRenderWhileRecording: Bool = true {
-        didSet {
-            self.onlyRenderWhileRec = self.onlyRenderWhileRecording
-        }
-    }
-
-    /**
-     A boolean that enables or disables audio `mixWithOthers` if audio recording is enabled. This allows playing music and recording audio at the same time. Default is `true`.
-     */
-    @objc public var enableMixWithOthers: Bool = true
-    /**
-     A boolean that enables or disables adjusting captured media for sharing online. Default is `true`.
-     */
-    @objc public var adjustVideoForSharing: Bool = true
     /**
      A boolean that enables or disables adjusting captured GIFs for sharing online. Default is `true`.
      */
-    @objc public var adjustGIFForSharing: Bool = true
-    /**
-     A boolean that enables or disables clearing cached media after exporting to Camera Roll. Default is `true`.
-     */
-    @objc public var deleteCacheWhenExported: Bool = true
-    /**
-     A boolean that enables or disables using envronment light rendering. Default is `false`.
-     */
-    @objc public var enableAdjustEnvironmentLighting: Bool = false {
-        didSet{
-            if (renderEngine != nil) {
-                renderEngine.autoenablesDefaultLighting = enableAdjustEnvironmentLighting
-            }
-        }
-    }
     
     //MARK: - Public initialization methods
     /**
      Initialize 🌞🍳 `RecordAR` with an `ARSCNView` 🚀.
      */
-    @objc override public init?(ARSceneKit: ARSCNView) {
-        super.init(ARSceneKit: ARSceneKit)
+    @objc public init?(ARSceneKit: ARSCNView) {
+        super.init()
         view = ARSceneKit
         setup()
     }
@@ -112,31 +68,8 @@ private var renderer: RenderAR!
     //MARK: - Objects
     private var scnView: SCNView!
     private var fileCount = 0
-    
-    var parent: UIViewController? {
-        if let view = view as? ARSCNView {
-            return view.parent!
-        } else if let view = view as? ARSKView {
-            return view.parent!
-        } else if let view = view as? SCNView {
-            return view.parent!
-        }
-        return nil
-    }
-    
-    //Used for gif capturing
-    var gifImages:[UIImage] = []
-    //Used for checking current recorder status
-    var isCapturingPhoto = false
-    var isRecordingGIF = false
+
     var isRecording = false
-    var adjustPausedTime = false
-    var backFromPause = false
-    var recordingWithLimit = false
-    var onlyRenderWhileRec = true
-    //Used to modify video time when paused
-    var pausedFrameTime: CMTime?
-    var resumeFrameTime: CMTime?
     //Used to locate the path of the video recording
     var currentVideoPath: URL?
     //Used to locate the path of the audio recording
@@ -168,6 +101,7 @@ private var renderer: RenderAR!
             }
             renderEngine = SCNRenderer(device: mtlDevice, options: nil)
             renderEngine.scene = view.scene
+            renderEngine.autoenablesDefaultLighting = true
             
             gpuLoop = CADisplayLink(target: self, selector: #selector(renderFrame))
             gpuLoop.preferredFramesPerSecond = 0 // Let GPU decide what framerate to use
@@ -175,10 +109,9 @@ private var renderer: RenderAR!
             
             status = .readyToRecord
         }
+      
         
-        onlyRenderWhileRec = onlyRenderWhileRecording
-        
-        renderer = RenderAR(view, renderer: renderEngine, contentMode: contentMode)
+        renderer = RenderAR(view, renderer: renderEngine)
 
         NotificationCenter.default.addObserver(self, selector: #selector(appWillEnterBackground), name: Notification.Name.UIApplicationWillResignActive, object: nil)
     }
@@ -204,15 +137,7 @@ private var renderer: RenderAR!
      
      In order to resume recording, simply call the `record()` method.
      */
-    @objc public func pause() {
-        if !recordingWithLimit {
-            onlyRenderWhileRec = false
-            isRecording = false
-            adjustPausedTime = true
-        } else {
-            logAR.message("NOT PERMITTED: The [ pause() ] method CAN NOT be used while using [ record(forDuration duration: TimeInterval) ]")
-        }
-    }
+
     /**
      A method that stops ⏹ recording a video 📹 and exports it to the Photo Library 📲💾.
      
@@ -232,13 +157,6 @@ private var renderer: RenderAR!
     @objc public func stopAndExport(_ finished: ((_ videoPath: URL, _ permissionStatus: PHAuthorizationStatus, _ exported: Bool) -> Swift.Void)? = nil) {
         writerQueue.sync {
             self.isRecording = false
-            self.adjustPausedTime = false
-            self.backFromPause = false
-            self.recordingWithLimit = false
-            
-            self.pausedFrameTime = nil
-            self.resumeFrameTime = nil
-            
             self.writer?.end {
                 if let path = self.currentVideoPath {
                     self.export(video: path) { exported, status in
@@ -267,14 +185,7 @@ private var renderer: RenderAR!
      */
     @objc public func stop(_ finished:((_ videoPath: URL) -> Swift.Void)? = nil) {
         writerQueue.sync {
-            isRecording = false
-            adjustPausedTime = false
-            backFromPause = false
-            recordingWithLimit = false
-            
-            pausedFrameTime = nil
-            resumeFrameTime = nil
-            
+            isRecording = false            
             DispatchQueue.main.async {
                 self.writer?.end {
                     if let path = self.currentVideoPath {
@@ -317,7 +228,7 @@ private var renderer: RenderAR!
                 PHPhotoLibrary.shared().performChanges({
                     PHAssetChangeRequest.creationRequestForAssetFromVideo(atFileURL: path)
                 }) { saved, error in
-                    if saved && self.deleteCacheWhenExported {
+                    if saved {
                         logAR.remove(from: path)
                     }
                     finished?(saved, status)
@@ -357,7 +268,7 @@ private var renderer: RenderAR!
                     PHAssetChangeRequest.creationRequestForAsset(from: image)
                 }
             }) { saved, error in
-                if saved && self.deleteCacheWhenExported {
+                if saved {
                     if let path = path {
                         logAR.remove(from: path)
                     }
@@ -401,8 +312,6 @@ private var renderer: RenderAR!
      - parameter configuration: An object that defines motion and scene tracking behaviors for the session.
     */
     @objc public func prepare(_ configuration: ARConfiguration? = nil) {
-        ARcontentMode = contentMode
-        onlyRenderWhileRec = onlyRenderWhileRecording
         if let view = view as? ARSCNView {
             
             //try resetting anchors for the initial landscape orientation issue.
@@ -417,7 +326,6 @@ private var renderer: RenderAR!
 extension RecordAR {
     @objc func renderFrame() {
         //frame rendering
-        if self.onlyRenderWhileRec && !isRecording && !isRecordingGIF { return }
 
         guard let buffer = renderer.buffer else { return }
         guard let rawBuffer = renderer.rawBuffer else {
@@ -428,7 +336,6 @@ extension RecordAR {
             logAR.message("ERROR:- An error occurred while rendering the camera buffer.")
             return
         }
-        renderer.ARcontentMode = contentMode
 
         self.writerQueue.sync {
             var time: CMTime { return CMTimeMakeWithSeconds(renderer.time, 1000000) }
@@ -438,20 +345,8 @@ extension RecordAR {
             //frame writing
             if self.isRecording {
                 if let frameWriter = self.writer {
-                    var finalFrameTime: CMTime?
-                    if self.backFromPause {
-                        if self.resumeFrameTime == nil {
-                            self.resumeFrameTime = time
-                        }
-                        //Formula: (currentTime - (timeWhenResume - timeWhenPaused))
-                        guard let resumeTime = self.resumeFrameTime,
-                            let pausedTime = self.pausedFrameTime else { return }
-                        finalFrameTime = self.adjustTime(current: time, resume: resumeTime, pause: pausedTime)
-                    } else {
-                        finalFrameTime = time
-                    }
-                    
-                    frameWriter.insert(pixel: buffer, with: finalFrameTime!)
+                    let finalFrameTime = time
+                    frameWriter.insert(pixel: buffer, with: finalFrameTime)
                     
                     guard let isWriting = frameWriter.isWritingWithoutError else { return }
                     if !isWriting {
@@ -464,25 +359,9 @@ extension RecordAR {
                 } else {
                     self.currentVideoPath = self.newVideoPath
                     
-                    self.writer = WritAR(output: self.currentVideoPath!, width: Int(size.width), height: Int(size.height), adjustForSharing: self.adjustVideoForSharing, queue: self.writerQueue, allowMix: self.enableMixWithOthers)
+                    self.writer = WritAR(output: self.currentVideoPath!, width: Int(size.width), height: Int(size.height), queue: self.writerQueue)
                     self.writer?.delegate = self.delegate
                 }
-            } else if !self.isRecording && self.adjustPausedTime {
-                writer?.pause()
-
-                self.adjustPausedTime = false
-                
-                if self.pausedFrameTime != nil {
-                    self.pausedFrameTime = self.adjustTime(current: time, resume: self.resumeFrameTime!, pause: self.pausedFrameTime!)
-                } else {
-                    self.pausedFrameTime = time
-                }
-                
-                self.backFromPause = true
-                self.resumeFrameTime = nil
-                
-                self.status = .paused
-                self.onlyRenderWhileRec = onlyRenderWhileRecording
             }
         }
     }

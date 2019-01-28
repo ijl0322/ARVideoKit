@@ -14,13 +14,10 @@
 		FBD604F51FA96B3300EC9804 /* UIImage+VideoBuffer.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBD604F01FA96B3300EC9804 /* UIImage+VideoBuffer.swift */; };
 		FBD604F71FA96B3300EC9804 /* RecordAR+PhotoRender.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBD604F21FA96B3300EC9804 /* RecordAR+PhotoRender.swift */; };
 		FBD604F81FA96B3300EC9804 /* UIView+isType.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBD604F31FA96B3300EC9804 /* UIView+isType.swift */; };
-		FBD604F91FA96B3300EC9804 /* UIViewController+hasType.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBD604F41FA96B3300EC9804 /* UIViewController+hasType.swift */; };
 		FBD604FC1FA96B3E00EC9804 /* RecordARDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBD604FA1FA96B3E00EC9804 /* RecordARDelegate.swift */; };
 		FBD604FD1FA96B3E00EC9804 /* RenderARDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBD604FB1FA96B3E00EC9804 /* RenderARDelegate.swift */; };
-		FBD605111FA96BA100EC9804 /* ARView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBD6050D1FA96BA100EC9804 /* ARView.swift */; };
 		FBD605121FA96BA100EC9804 /* RecordAR.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBD6050E1FA96BA100EC9804 /* RecordAR.swift */; };
 		FBD605131FA96BA100EC9804 /* WritAR.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBD6050F1FA96BA100EC9804 /* WritAR.swift */; };
-		FBD605141FA96BA100EC9804 /* ViewAR.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBD605101FA96BA100EC9804 /* ViewAR.swift */; };
 		FBE5A5A62002BFCF0025C89F /* RenderAR.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBE5A5A52002BFCF0025C89F /* RenderAR.swift */; };
 /* End PBXBuildFile section */
 
@@ -34,13 +31,10 @@
 		FBD604F01FA96B3300EC9804 /* UIImage+VideoBuffer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "UIImage+VideoBuffer.swift"; sourceTree = "<group>"; };
 		FBD604F21FA96B3300EC9804 /* RecordAR+PhotoRender.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "RecordAR+PhotoRender.swift"; sourceTree = "<group>"; };
 		FBD604F31FA96B3300EC9804 /* UIView+isType.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "UIView+isType.swift"; sourceTree = "<group>"; };
-		FBD604F41FA96B3300EC9804 /* UIViewController+hasType.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "UIViewController+hasType.swift"; sourceTree = "<group>"; };
 		FBD604FA1FA96B3E00EC9804 /* RecordARDelegate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RecordARDelegate.swift; sourceTree = "<group>"; };
 		FBD604FB1FA96B3E00EC9804 /* RenderARDelegate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RenderARDelegate.swift; sourceTree = "<group>"; };
-		FBD6050D1FA96BA100EC9804 /* ARView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ARView.swift; sourceTree = "<group>"; };
 		FBD6050E1FA96BA100EC9804 /* RecordAR.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RecordAR.swift; sourceTree = "<group>"; };
 		FBD6050F1FA96BA100EC9804 /* WritAR.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = WritAR.swift; sourceTree = "<group>"; };
-		FBD605101FA96BA100EC9804 /* ViewAR.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ViewAR.swift; sourceTree = "<group>"; };
 		FBE5A5A52002BFCF0025C89F /* RenderAR.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RenderAR.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -117,7 +111,6 @@
 				FBD604F21FA96B3300EC9804 /* RecordAR+PhotoRender.swift */,
 				FBD604F01FA96B3300EC9804 /* UIImage+VideoBuffer.swift */,
 				FBD604F31FA96B3300EC9804 /* UIView+isType.swift */,
-				FBD604F41FA96B3300EC9804 /* UIViewController+hasType.swift */,
 			);
 			path = Extensions;
 			sourceTree = "<group>";
@@ -143,9 +136,7 @@
 		FBD6050C1FA96B8F00EC9804 /* Sources */ = {
 			isa = PBXGroup;
 			children = (
-				FBD6050D1FA96BA100EC9804 /* ARView.swift */,
 				FBD6050E1FA96BA100EC9804 /* RecordAR.swift */,
-				FBD605101FA96BA100EC9804 /* ViewAR.swift */,
 			);
 			path = Sources;
 			sourceTree = "<group>";
@@ -236,9 +227,6 @@
 				FBD604FD1FA96B3E00EC9804 /* RenderARDelegate.swift in Sources */,
 				FBD605131FA96BA100EC9804 /* WritAR.swift in Sources */,
 				FBD604F51FA96B3300EC9804 /* UIImage+VideoBuffer.swift in Sources */,
-				FBD605111FA96BA100EC9804 /* ARView.swift in Sources */,
-				FBD604F91FA96B3300EC9804 /* UIViewController+hasType.swift in Sources */,
-				FBD605141FA96BA100EC9804 /* ViewAR.swift in Sources */,
 				FBD604EE1FA96B2700EC9804 /* ARVideoOptions.swift in Sources */,
 				FBD605121FA96BA100EC9804 /* RecordAR.swift in Sources */,
 				FBE5A5A62002BFCF0025C89F /* RenderAR.swift in Sources */,
