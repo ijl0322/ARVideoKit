@@ -129,7 +129,7 @@ class WritAR: NSObject, AVCaptureAudioDataOutputSampleBufferDelegate {
             }
         } else if assetWriter.status == .failed {
             delegate?.recorder(didFailRecording: assetWriter.error)
-            logAR.message("An error occurred while recording the video, status: \(assetWriter.status.rawValue), error: \(assetWriter.error!.localizedDescription)")
+            print("An error occurred while recording the video, status: \(assetWriter.status.rawValue), error: \(assetWriter.error!.localizedDescription)")
             isWritingWithoutError = false
             return
         }
@@ -157,7 +157,7 @@ class WritAR: NSObject, AVCaptureAudioDataOutputSampleBufferDelegate {
             }
         } else if assetWriter.status == .failed {
             delegate?.recorder(didFailRecording: assetWriter.error)
-            logAR.message("An error occurred while recording the video, status: \(assetWriter.status.rawValue), error: \(assetWriter.error!.localizedDescription)")
+            print("An error occurred while recording the video, status: \(assetWriter.status.rawValue), error: \(assetWriter.error!.localizedDescription)")
             isRecording = false
             isWritingWithoutError = false
             return
@@ -194,28 +194,5 @@ class WritAR: NSObject, AVCaptureAudioDataOutputSampleBufferDelegate {
 private extension WritAR {
     func append(pixel buffer: CVPixelBuffer, with time: CMTime) {
         pixelBufferInput.append(buffer, withPresentationTime: time)
-    }
-}
-
-//Simple Logging to show logs only while debugging.
-class logAR {
-    class func message(_ message: String) {
-        #if DEBUG
-            print("ARVideoKit @ \(Date().timeIntervalSince1970):- \(message)")
-        #endif
-    }
-    
-    class func remove(from path: URL?) {
-        if let file = path?.path {
-            let manager = FileManager.default
-            if manager.fileExists(atPath: file) {
-                do{
-                    try manager.removeItem(atPath: file)
-                    self.message("Successfuly deleted media file from cached after exporting to Camera Roll.")
-                } catch let error {
-                    self.message("An error occurred while deleting cached media: \(error)")
-                }
-            }
-        }
     }
 }

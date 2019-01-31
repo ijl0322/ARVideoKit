@@ -8,7 +8,7 @@
 
 import CoreVideo
 import UIKit
-//
+
 extension UIImage
 {
     //Generate CVPixelBuffer from UIImage

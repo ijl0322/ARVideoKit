@@ -18,53 +18,23 @@ private var gpuLoop: CADisplayLink!
 private var isResting = false
 @available(iOS 11.0, *)
 private var renderer: ARSCNBufferRenderer!
-/**
- This class renders the `ARSCNView` or `ARSKView` content with the device's camera stream to generate a video 📹, photo 🌄, live photo 🎇 or GIF 🎆.
 
- - Author: 🤓 Ahmed Fathi Bekhit © 2017
- * [Github](http://github.com/AFathi)
- * [Website](http://ahmedbekhit.com)
- * [Twitter](http://twitter.com/iAFapps)
- * [Email](mailto:me@ahmedbekhit.com)
- */
 @available(iOS 11.0, *)
 @objc public class RecordAR: NSObject {
-    //MARK: - Public objects to configure RecordAR
-    /**
-     An object that passes the AR recorder errors and status in the protocol methods.
-     */
     @objc public weak var delegate: RecordARDelegate?
-    /**
-     An object that returns the AR recorder current status.
-     */
     @objc public internal(set)var status: RecordARStatus = .unknown
-    /**
-     An object that returns the current Microphone status.
-     */
     @objc public internal(set)var micStatus: RecordARMicrophoneStatus = .unknown
 
-    /**
-     A boolean that enables or disables adjusting captured GIFs for sharing online. Default is `true`.
-     */
-    
-    //MARK: - Public initialization methods
-    /**
-     Initialize 🌞🍳 `RecordAR` with an `ARSCNView` 🚀.
-     */
     @objc public init?(ARSceneKit: ARSCNView) {
         super.init()
         view = ARSceneKit
         setup()
     }
-    
-    //MARK: - threads
+  
     let writerQueue = DispatchQueue(label:"com.littlstar.ARWriterQueue")
     let audioSessionQueue = DispatchQueue(label: "com.littlstar.ARAudioSessionQueue", attributes: .concurrent)
-    
-    //MARK: - Objects
+  
     private var scnView: SCNView!
-    private var fileCount = 0
-
     var isRecording = false
     var currentVideoPath: URL?
     var writer: WritAR?
@@ -78,7 +48,6 @@ private var renderer: ARSCNBufferRenderer!
     func setup() {
         if let view = view as? ARSCNView {
             guard let mtlDevice = MTLCreateSystemDefaultDevice() else {
-                logAR.message("ERROR:- This device does not support Metal")
                 return
             }
             renderEngine = SCNRenderer(device: mtlDevice, options: nil)
@@ -88,16 +57,11 @@ private var renderer: ARSCNBufferRenderer!
             gpuLoop = CADisplayLink(target: self, selector: #selector(renderFrame))
             gpuLoop.preferredFramesPerSecond = 0 // Let GPU decide what framerate to use
             gpuLoop.add(to: .main, forMode: .commonModes)
-            
             status = .readyToRecord
         }
-      
-        
         renderer = ARSCNBufferRenderer(view, renderer: renderEngine)
     }
   
-
-    ///A method that starts or resumes ⏯ recording a video 📹.
     @objc public func record() {
         writerQueue.sync {
             if micStatus == .unknown {
@@ -112,57 +76,6 @@ private var renderer: ARSCNBufferRenderer!
         }
     }
 
-    /**
-     A method that pauses recording a video ⏸📹.
-     
-     In order to resume recording, simply call the `record()` method.
-     */
-
-    /**
-     A method that stops ⏹ recording a video 📹 and exports it to the Photo Library 📲💾.
-     
-     - parameter finished: A block that will be called when the export process is complete.
-     
-        The block returns the following parameters:
-     
-        `videoPath`
-        A `URL` object that contains the local file path of the video to allow manual exporting or preview of the video.
-     
-        `permissionStatus`
-        A `PHAuthorizationStatus` object that returns the current application's status for exporting media to the Photo Library.
-     
-        `exported`
-        A boolean that returns `true` when a video is successfully exported to the Photo Library. Otherwise, it returns `false`.
-     */
-    @objc public func stopAndExport(_ finished: ((_ videoPath: URL, _ permissionStatus: PHAuthorizationStatus, _ exported: Bool) -> Swift.Void)? = nil) {
-        writerQueue.sync {
-            self.isRecording = false
-            self.writer?.end {
-                if let path = self.currentVideoPath {
-                    self.export(video: path) { exported, status in
-                        finished?(path, status, exported)
-                    }
-                    self.delegate?.recorder(didEndRecording: path, with: true)
-                    self.status = .readyToRecord
-                } else {
-                    finished?(self.currentVideoPath!, .notDetermined, false)
-                    self.status = .readyToRecord
-                    self.delegate?.recorder(didFailRecording: errSecDecode as? Error)
-                }
-                self.writer = nil
-            }
-        }
-    }
-    /**
-     A method that stops ⏹ recording a video 📹 and returns the video path in the completion handler.
-     
-     - parameter finished: A block that will be called when the specified `duration` has ended.
-     
-        The block returns the following parameter:
-     
-        `videoPath`
-        A `URL` object that contains the local file path of the video to allow manual exporting or preview of the video.
-     */
     @objc public func stop(_ finished:((_ videoPath: URL) -> Swift.Void)? = nil) {
         writerQueue.sync {
             isRecording = false            
@@ -181,95 +94,7 @@ private var renderer: ARSCNBufferRenderer!
             }
         }
     }
-    /**
-     A method that exports a video 📹 file path to the Photo Library 📲💾.
-     
-     - parameter path: A `URL` object that can be set to a local video file path to export to the Photo Library.
 
-     - parameter finished: A block that will be called when the export process is complete.
-     
-        The block returns the following parameters:
-     
-        `exported`
-        A boolean that returns `true` when a video is successfully exported to the Photo Library. Otherwise, it returns `false`.
-     
-        `permissionStatus`
-        A `PHAuthorizationStatus` object that returns the current application's status for exporting media to the Photo Library.
-     */
-    @objc public func export(video path: URL, _ finished: ((_ exported: Bool, _ permissionStatus: PHAuthorizationStatus) -> Void)? = nil) {
-        audioSessionQueue.async {
-            let status = PHPhotoLibrary.authorizationStatus()
-            if status == .notDetermined {
-                PHPhotoLibrary.requestAuthorization() { status in
-                    // Recursive call after authorization request
-                    self.export(video: path, finished)
-                }
-            } else if status == .authorized {
-                PHPhotoLibrary.shared().performChanges({
-                    PHAssetChangeRequest.creationRequestForAssetFromVideo(atFileURL: path)
-                }) { saved, error in
-                    if saved {
-                        logAR.remove(from: path)
-                    }
-                    finished?(saved, status)
-                }
-            } else if status == .denied || status == .restricted {
-                finished?(false, status)
-            }
-        }
-    }
-    /**
-     A method that exports any image 🌄/🎆 (including gif, jpeg, and png) to the Photo Library 📲💾.
-     
-     - parameter path: A `URL` object that can be set to a local image file path to export to the Photo Library.
-     - parameter UIImage: A `UIImage` object.
-     - parameter finished: A block that will be called when the export process is complete.
-     
-        The block returns the following parameters:
-     
-        `exported`
-        A boolean that returns `true` when an image is successfully exported to the Photo Library. Otherwise, it returns `false`.
-     
-        `permissionStatus`
-        A `PHAuthorizationStatus` object that returns the current application's status for exporting media to the Photo Library.
-     */
-    @objc public func export(image path: URL? = nil, UIImage: UIImage? = nil, _ finished: ((_ exported: Bool, _ permissionStatus: PHAuthorizationStatus) -> Void)? = nil) {
-        let status = PHPhotoLibrary.authorizationStatus()
-        if status == .notDetermined {
-            PHPhotoLibrary.requestAuthorization() { status in
-                // Recursive call after authorization request
-                self.export(image: path, UIImage: UIImage, finished)
-            }
-        } else if status == .authorized {
-            PHPhotoLibrary.shared().performChanges({
-                if let path = path {
-                    PHAssetChangeRequest.creationRequestForAssetFromImage(atFileURL: path)
-                } else if let image = UIImage {
-                    PHAssetChangeRequest.creationRequestForAsset(from: image)
-                }
-            }) { saved, error in
-                if saved {
-                    if let path = path {
-                        logAR.remove(from: path)
-                    }
-                }
-                finished?(saved, status)
-            }
-        } else if status == .denied || status == .restricted {
-            finished?(false, status)
-        }
-    }
-
-    
-    /**
-     A method that requsts microphone 🎙 permission manually, if micPermission is set to `manual`.
-     - parameter finished: A block that will be called when the audio permission is requested.
-     
-     The block returns the following parameter:
-     
-     `status`
-     A boolean that returns `true` when a the Microphone access is permitted. Otherwise, it returns `false`.
-     */
     @objc public func requestMicrophonePermission(_ finished: ((_ status: Bool) -> Swift.Void)? = nil) {
         AVAudioSession.sharedInstance().requestRecordPermission({ permitted in
             finished?(permitted)
