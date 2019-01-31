@@ -21,17 +21,7 @@ import ARKit
  * [Email](mailto:me@ahmedbekhit.com)
  */
 @available(iOS 11.0, *)
-@objc public protocol RecordARDelegate {
-    /**
-     A protocol method that is triggered when a recorder ends recording.
-     - parameter path: A `URL` object that returns the video file path.
-     - parameter noError: A boolean that returns true when the recorder ends without errors. Otherwise, it returns false.
-     */
+@objc public protocol ARRecorderDelegate {
     func recorder(didEndRecording path: URL, with noError: Bool)
-    /**
-     A protocol method that is triggered when a recorder fails recording.
-     - parameter error: An `Error` object that returns the error value.
-     - parameter status: A string that returns the reason of the recorder failure in a string literal format.
-     */
     func recorder(didFailRecording error: Error?)
 }

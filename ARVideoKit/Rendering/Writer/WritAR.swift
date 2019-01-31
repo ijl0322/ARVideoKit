@@ -11,7 +11,7 @@ import CoreImage
 import UIKit
 
 @available(iOS 11.0, *)
-class WritAR: NSObject, AVCaptureAudioDataOutputSampleBufferDelegate {
+class ARAssetWriter: NSObject, AVCaptureAudioDataOutputSampleBufferDelegate {
     private var assetWriter: AVAssetWriter!
     private var videoInput: AVAssetWriterInput!
     private var audioInput: AVAssetWriterInput!
@@ -25,7 +25,7 @@ class WritAR: NSObject, AVCaptureAudioDataOutputSampleBufferDelegate {
 
     private var isRecording: Bool = false
     
-    var delegate: RecordARDelegate?
+    var delegate: ARRecorderDelegate?
 
     init(output: URL, width: Int, height: Int, queue: DispatchQueue) {
         super.init()
@@ -37,6 +37,7 @@ class WritAR: NSObject, AVCaptureAudioDataOutputSampleBufferDelegate {
         }
       
         // Enable background audio recording
+        // Need this configuration for recording sounds from HCAP nodes!!
         let audioOptions: AVAudioSessionCategoryOptions = [.mixWithOthers , .allowBluetooth, .defaultToSpeaker, .interruptSpokenAudioAndMixWithOthers]
         try? AVAudioSession.sharedInstance().setCategory(AVAudioSessionCategoryPlayAndRecord, with: audioOptions)
         try? AVAudioSession.sharedInstance().setActive(true)
@@ -188,11 +189,8 @@ class WritAR: NSObject, AVCaptureAudioDataOutputSampleBufferDelegate {
         }
         assetWriter.finishWriting(completionHandler: finished)
     }
-}
-
-@available(iOS 11.0, *)
-private extension WritAR {
-    func append(pixel buffer: CVPixelBuffer, with time: CMTime) {
-        pixelBufferInput.append(buffer, withPresentationTime: time)
+  
+    private func append(pixel buffer: CVPixelBuffer, with time: CMTime) {
+      pixelBufferInput.append(buffer, withPresentationTime: time)
     }
 }

@@ -8,23 +8,16 @@
 
 import Foundation
 /// An object that returns the AR recorder current status.
-@objc public enum RecordARStatus: Int {
-    /// The current status of the recorder is unknown.
+@objc public enum ARRecorderStatus: Int {
     case unknown
-    /// The current recorder is ready to record.
     case readyToRecord
-    /// The current recorder is recording.
     case recording
-    /// The current recorder is paused.
     case paused
 }
 
 /// An object that returns the current Microphone status.
-@objc public enum RecordARMicrophoneStatus: Int {
-    // The current status of the Microphone access is unknown.
+@objc public enum ARRecorderMicrophoneStatus: Int {
     case unknown
-    // The current status of the Microphone access is enabled.
     case enabled
-    // The current status of the Microphone access is disabled.
     case disabled
 }

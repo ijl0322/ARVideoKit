@@ -12,19 +12,17 @@ import ARKit
 import Photos
 import PhotosUI
 
-private var view: Any?
-private var renderEngine: SCNRenderer!
-private var gpuLoop: CADisplayLink!
-private var isResting = false
 @available(iOS 11.0, *)
-private var renderer: ARSCNBufferRenderer!
-
-@available(iOS 11.0, *)
-@objc public class RecordAR: NSObject {
-    @objc public weak var delegate: RecordARDelegate?
-    @objc public internal(set)var status: RecordARStatus = .unknown
-    @objc public internal(set)var micStatus: RecordARMicrophoneStatus = .unknown
-
+@objc public class ARRecorder: NSObject {
+    @objc public weak var delegate: ARRecorderDelegate?
+    @objc public internal(set)var status: ARRecorderStatus = .unknown
+    @objc public internal(set)var micStatus: ARRecorderMicrophoneStatus = .unknown
+    private var view: Any?
+    private var renderEngine: SCNRenderer!
+    private var gpuLoop: CADisplayLink!
+    private var isResting = false
+    private var renderer: ARSCNBufferRenderer!
+  
     @objc public init?(ARSceneKit: ARSCNView) {
         super.init()
         view = ARSceneKit
@@ -37,7 +35,7 @@ private var renderer: ARSCNBufferRenderer!
     private var scnView: SCNView!
     var isRecording = false
     var currentVideoPath: URL?
-    var writer: WritAR?
+    var writer: ARAssetWriter?
   
     //Generate a video path in Temp directory
     //Video may be delete by system after app termination.
@@ -109,7 +107,7 @@ private var renderer: ARSCNBufferRenderer!
 
 //MARK: - Public methods for setting up UIViewController orientations
 @available(iOS 11.0, *)
-@objc public extension RecordAR {
+@objc public extension ARRecorder {
     /**
      A method that prepares the video recorder with `ARConfiguration` 📝.
      
@@ -128,7 +126,7 @@ private var renderer: ARSCNBufferRenderer!
 
 //MARK: - AR Video Frames Rendering
 @available(iOS 11.0, *)
-extension RecordAR {
+extension ARRecorder {
     @objc func renderFrame() {
         guard let buffer = renderer.buffer else { return }
         guard let size = renderer.bufferSize else { return }
@@ -151,7 +149,7 @@ extension RecordAR {
                     }
                 } else {
                     self.currentVideoPath = self.newVideoPath
-                    self.writer = WritAR(output: self.currentVideoPath!, width: Int(size.width), height: Int(size.height), queue: self.writerQueue)
+                    self.writer = ARAssetWriter(output: self.currentVideoPath!, width: Int(size.width), height: Int(size.height), queue: self.writerQueue)
                     self.writer?.delegate = self.delegate
                 }
             }

@@ -10,7 +10,7 @@ import AVFoundation
 import Photos
 
 @available(iOS 11.0, *)
-extension RecordAR {
+extension ARRecorder {
 
     // Generate UIImage from CVPixelBuffer
     func imageFromBuffer(buffer: CVPixelBuffer) -> UIImage {

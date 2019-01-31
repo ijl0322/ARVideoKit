@@ -9,12 +9,10 @@
 import Foundation
 import ARKit
 
-private var view: Any?
-private var renderEngine: SCNRenderer!
-
 @available(iOS 11.0, *)
 struct ARSCNBufferRenderer {
-  
+    private var view: Any?
+    private var renderEngine: SCNRenderer!
     init(_ ARview: Any?, renderer: SCNRenderer) {
         view = ARview
         renderEngine = renderer
@@ -46,19 +44,13 @@ struct ARSCNBufferRenderer {
     var buffer: CVPixelBuffer? {
         if view is ARSCNView {
             guard let size = bufferSize else { return nil }
-            //UIScreen.main.bounds.size
             var renderedFrame: UIImage?
             pixelsQueue.sync {
                 renderedFrame = renderEngine.snapshot(atTime: self.time, with: size, antialiasingMode: .none)
             }
-            if let _ = renderedFrame {
-            } else {
-                renderedFrame = renderEngine.snapshot(atTime: time, with: size, antialiasingMode: .none)
+            if renderedFrame != nil {
+              return renderedFrame!.buffer
             }
-            
-            guard let buffer = renderedFrame!.buffer else { return nil }
-            
-            return buffer
         }
         return nil
     }

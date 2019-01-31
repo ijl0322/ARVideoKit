@@ -15,7 +15,7 @@
 		FBD604FC1FA96B3E00EC9804 /* RecordARDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBD604FA1FA96B3E00EC9804 /* RecordARDelegate.swift */; };
 		FBD605121FA96BA100EC9804 /* RecordAR.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBD6050E1FA96BA100EC9804 /* RecordAR.swift */; };
 		FBD605131FA96BA100EC9804 /* WritAR.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBD6050F1FA96BA100EC9804 /* WritAR.swift */; };
-		FBE5A5A62002BFCF0025C89F /* RenderAR.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBE5A5A52002BFCF0025C89F /* RenderAR.swift */; };
+		FBE5A5A62002BFCF0025C89F /* ARSCNBufferRenderer.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBE5A5A52002BFCF0025C89F /* ARSCNBufferRenderer.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -29,7 +29,7 @@
 		FBD604FA1FA96B3E00EC9804 /* RecordARDelegate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RecordARDelegate.swift; sourceTree = "<group>"; };
 		FBD6050E1FA96BA100EC9804 /* RecordAR.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RecordAR.swift; sourceTree = "<group>"; };
 		FBD6050F1FA96BA100EC9804 /* WritAR.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = WritAR.swift; sourceTree = "<group>"; };
-		FBE5A5A52002BFCF0025C89F /* RenderAR.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RenderAR.swift; sourceTree = "<group>"; };
+		FBE5A5A52002BFCF0025C89F /* ARSCNBufferRenderer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ARSCNBufferRenderer.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -118,7 +118,7 @@
 		FBD604E91FA96AF400EC9804 /* Rendering */ = {
 			isa = PBXGroup;
 			children = (
-				FBE5A5A52002BFCF0025C89F /* RenderAR.swift */,
+				FBE5A5A52002BFCF0025C89F /* ARSCNBufferRenderer.swift */,
 				FBA0AA0A1FAD9D9D006C481B /* Writer */,
 			);
 			path = Rendering;
@@ -218,7 +218,7 @@
 				FBD604F51FA96B3300EC9804 /* UIImage+VideoBuffer.swift in Sources */,
 				FBD604EE1FA96B2700EC9804 /* ARVideoOptions.swift in Sources */,
 				FBD605121FA96BA100EC9804 /* RecordAR.swift in Sources */,
-				FBE5A5A62002BFCF0025C89F /* RenderAR.swift in Sources */,
+				FBE5A5A62002BFCF0025C89F /* ARSCNBufferRenderer.swift in Sources */,
 				FBD604FC1FA96B3E00EC9804 /* RecordARDelegate.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
