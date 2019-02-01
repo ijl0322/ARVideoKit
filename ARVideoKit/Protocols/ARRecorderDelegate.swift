@@ -6,22 +6,14 @@
 //  Copyright © 2017 Ahmed Fathi Bekhit. All rights reserved.
 //
 
-import Foundation
-import CoreVideo
-import CoreMedia
-import ARKit
-
-/**
- The recorder protocol.
- 
- - Author: Ahmed Fathi Bekhit
- * [Github](http://github.com/AFathi)
- * [Website](http://ahmedbekhit.com)
- * [Twitter](http://twitter.com/iAFapps)
- * [Email](mailto:me@ahmedbekhit.com)
- */
 @available(iOS 11.0, *)
+// Delegate method for ARRecorder
 @objc public protocol ARRecorderDelegate {
+    // Returns a path to the recorded video,
+    // noError will be false if error occurred while recording
+    // should handle deleting broken video at path
     func recorder(didEndRecording path: URL, with noError: Bool)
+    // Gets called if some error ocurred at any time
+    // May get called concurrently with didEndRecording
     func recorder(didFailRecording error: Error?)
 }

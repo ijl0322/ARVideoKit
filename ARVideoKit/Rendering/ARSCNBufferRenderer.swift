@@ -10,6 +10,7 @@ import Foundation
 import ARKit
 
 @available(iOS 11.0, *)
+//Use SCNRenderer to generate CVPixelBuffer from current SCNScene
 struct ARSCNBufferRenderer {
     private var view: Any?
     private var renderEngine: SCNRenderer!
@@ -34,6 +35,7 @@ struct ARSCNBufferRenderer {
         let width = Int(UIScreen.main.nativeBounds.width)
         let height = Int(UIScreen.main.nativeBounds.height)
       
+        // Take device orientation change into account
         if width > height {
             return CGSize(width: height, height: width)
         } else {

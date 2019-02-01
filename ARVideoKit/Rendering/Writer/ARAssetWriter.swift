@@ -11,12 +11,12 @@ import CoreImage
 import UIKit
 
 @available(iOS 11.0, *)
+// Create video and audio asset writer to accept live input from SCNScene
 class ARAssetWriter: NSObject, AVCaptureAudioDataOutputSampleBufferDelegate {
     private var assetWriter: AVAssetWriter!
     private var videoInput: AVAssetWriterInput!
     private var audioInput: AVAssetWriterInput!
     private var session: AVCaptureSession!
-    
     private var pixelBufferInput: AVAssetWriterInputPixelBufferAdaptor!
     private var videoOutputSettings: Dictionary<String, AnyObject>!
     private var audioSettings: [String: Any]?
@@ -58,9 +58,6 @@ class ARAssetWriter: NSObject, AVCaptureAudioDataOutputSampleBufferDelegate {
         videoInput.expectsMediaDataInRealTime = true
         pixelBufferInput = AVAssetWriterInputPixelBufferAdaptor(assetWriterInput: videoInput, sourcePixelBufferAttributes: nil)
       
-        let t = CGAffineTransform.identity
-        videoInput.transform = t
-        
         if assetWriter.canAdd(videoInput) {
             assetWriter.add(videoInput)
         } else {
@@ -110,36 +107,7 @@ class ARAssetWriter: NSObject, AVCaptureAudioDataOutputSampleBufferDelegate {
     
     var startingVideoTime: CMTime?
     var isWritingWithoutError: Bool?
-    
-    func insert(pixel buffer: CVPixelBuffer, with intervals: CFTimeInterval) {
-        let time: CMTime = CMTimeMakeWithSeconds(intervals, 1000000)
-        if assetWriter.status == .unknown {
-            guard startingVideoTime == nil else {
-                isWritingWithoutError = false
-                return
-            }
-            startingVideoTime = time
-            if assetWriter.startWriting() {
-                assetWriter.startSession(atSourceTime: startingVideoTime!)
-                session.startRunning()
-                isRecording = true
-                isWritingWithoutError = true
-            } else {
-                delegate?.recorder(didFailRecording: assetWriter.error)
-                isWritingWithoutError = false
-            }
-        } else if assetWriter.status == .failed {
-            delegate?.recorder(didFailRecording: assetWriter.error)
-            print("An error occurred while recording the video, status: \(assetWriter.status.rawValue), error: \(assetWriter.error!.localizedDescription)")
-            isWritingWithoutError = false
-            return
-        }
-        if videoInput.isReadyForMoreMediaData {
-            append(pixel: buffer, with: time)
-            isWritingWithoutError = true
-        }
-    }
-    
+  
     func insert(pixel buffer: CVPixelBuffer, with time: CMTime) {
         if assetWriter.status == .unknown {
             guard startingVideoTime == nil else {
