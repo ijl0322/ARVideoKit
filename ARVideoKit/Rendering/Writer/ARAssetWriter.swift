@@ -155,7 +155,12 @@ class ARAssetWriter: NSObject, AVCaptureAudioDataOutputSampleBufferDelegate {
                 session.stopRunning()
             }
         }
-        assetWriter.finishWriting(completionHandler: finished)
+        videoInput.markAsFinished()
+        audioInput.markAsFinished()
+        assetWriter.finishWriting(completionHandler: {
+          finished()
+          self.assetWriter = nil
+        })
     }
   
     private func append(pixel buffer: CVPixelBuffer, with time: CMTime) {

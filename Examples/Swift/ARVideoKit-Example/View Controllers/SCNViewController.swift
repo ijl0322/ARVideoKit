@@ -11,7 +11,7 @@ import ARKit
 import ARVideoKit
 import Photos
 
-class SCNViewController: UIViewController, ARSCNViewDelegate, RecordARDelegate  {
+class SCNViewController: UIViewController, ARSCNViewDelegate, ARRecorderDelegate  {
     
     @IBOutlet var sceneView: ARSCNView!
     @IBOutlet var recordBtn: UIButton!
@@ -20,7 +20,7 @@ class SCNViewController: UIViewController, ARSCNViewDelegate, RecordARDelegate  
     let recordingQueue = DispatchQueue(label: "recordingThread", attributes: .concurrent)
     let caprturingQueue = DispatchQueue(label: "capturingThread", attributes: .concurrent)
 
-    var recorder:RecordAR?
+    var recorder:ARRecorder?
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -43,7 +43,7 @@ class SCNViewController: UIViewController, ARSCNViewDelegate, RecordARDelegate  
         // Initialize ARVideoKit recorder
 
 
-        recorder = RecordAR(ARSceneKit: sceneView)
+        recorder = ARRecorder(ARSceneKit: sceneView)
         
         /*----👇---- ARVideoKit Configuration ----👇----*/
         
@@ -71,7 +71,7 @@ class SCNViewController: UIViewController, ARSCNViewDelegate, RecordARDelegate  
         sceneView.session.pause()
         
         if recorder?.status == .recording {
-            recorder?.stopAndExport()
+            recorder?.stop()
         }
         recorder?.prepare(ARWorldTrackingConfiguration())
     }
@@ -142,11 +142,12 @@ extension SCNViewController {
                 pauseBtn.setTitle("Pause", for: .normal)
                 pauseBtn.isEnabled = false
                 recorder?.stop() { path in
-                    self.recorder?.export(video: path) { saved, status in
-                        DispatchQueue.main.sync {
-                            self.exportMessage(success: saved, status: status)
-                        }
-                    }
+//                    self.recorder?.export(video: path) { saved, status in
+//                        DispatchQueue.main.sync {
+//                            self.exportMessage(success: saved, status: status)
+//                        }
+//                    }
+                  print(path)
                 }
             }
         }else if sender.tag == 2 {
@@ -177,11 +178,11 @@ extension SCNViewController {
         // Inform user an error occurred while recording.
     }
     
-    func recorder(willEnterBackground status: RecordARStatus) {
-        // Use this method to pause or stop video recording. Check [applicationWillResignActive(_:)](https://developer.apple.com/documentation/uikit/uiapplicationdelegate/1622950-applicationwillresignactive) for more information.
-        if status == .recording {
-            recorder?.stopAndExport()
-        }
-    }
+//    func recorder(willEnterBackground status: RecordARStatus) {
+//        // Use this method to pause or stop video recording. Check [applicationWillResignActive(_:)](https://developer.apple.com/documentation/uikit/uiapplicationdelegate/1622950-applicationwillresignactive) for more information.
+//        if status == .recording {
+//            recorder?.stopAndExport()
+//        }
+//    }
 }
 

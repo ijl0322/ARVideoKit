@@ -33,7 +33,7 @@ import PhotosUI
     let audioSessionQueue = DispatchQueue(label: "com.littlstar.ARAudioSessionQueue", attributes: .concurrent)
   
     private var scnView: SCNView!
-    var isRecording = false
+    @objc public var isRecording = false
     var currentVideoPath: URL?
     var writer: ARAssetWriter?
   
